@@ -1,0 +1,80 @@
+# Core desktop UI
+flet==0.24.1
+
+# Web framework
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+python-multipart==0.0.17
+sse-starlette==2.1.3
+
+# Database
+sqlalchemy[asyncio]==2.0.36
+aiosqlite==0.20.0
+asyncpg==0.30.0
+alembic==1.14.0
+
+# Pydantic
+pydantic==2.10.3
+pydantic-settings==2.6.1
+
+# Authentication
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+cryptography==43.0.3
+
+# HTTP client
+httpx==0.28.1
+aiofiles==24.1.0
+
+# LLM Providers
+openai==1.58.1
+anthropic==0.40.0
+google-generativeai==0.8.3
+
+# Embeddings
+sentence-transformers==3.3.1
+torch==2.5.1
+torchvision==0.20.1
+
+# Vector store
+chromadb==0.5.23
+
+# Sparse retrieval
+rank-bm25==0.2.2
+
+# Token counting
+tiktoken==0.8.0
+
+# Document processing
+pdfplumber==0.11.4
+PyPDF2==3.0.1
+python-docx==1.1.2
+beautifulsoup4==4.12.3
+lxml==5.3.0
+markdown==3.7
+pandas==2.2.3
+openpyxl==3.1.5
+
+# Web crawling
+trafilatura==2.0.0
+playwright==1.49.0
+
+# Structured logging
+structlog==24.4.0
+
+# Utilities
+python-dotenv==1.0.1
+Pillow==11.0.0
+rich==13.9.4
+click==8.1.7
+
+# Testing
+pytest==8.3.4
+pytest-asyncio==0.24.0
+pytest-mock==3.14.0
+
+# Optional: Pinecone cloud sync
+pinecone-client==5.0.1
+
+# Cross-encoder reranking
+transformers==4.47.1
