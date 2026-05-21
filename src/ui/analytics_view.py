@@ -219,7 +219,7 @@ class AnalyticsView(ft.Column):
                             ft.Container(
                                 content=ft.Text(f"{q.get('count', 0)}", size=14, weight=ft.FontWeight.BOLD, color=ACCENT_BLUE),
                                 bgcolor=f"{ACCENT_BLUE}15",
-                                border_radius=8, padding=ft.padding.symmetric(horizontal=10, vertical=4),
+                                border_radius=8, padding=ft.Padding.symmetric(horizontal=10, vertical=4),
                             ),
                         ],
                         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,

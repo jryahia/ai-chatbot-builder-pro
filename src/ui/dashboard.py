@@ -137,7 +137,7 @@ class DashboardView(ft.Container):
         return ft.Container(
             padding=60,
             border_radius=16,
-            border=ft.border.all(1, ft.Colors.with_opacity(0.1, ft.Colors.WHITE)),
+            border=ft.Border.all(1, ft.Colors.with_opacity(0.1, ft.Colors.WHITE)),
             content=ft.Column(
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 spacing=15,
@@ -168,7 +168,7 @@ class DashboardView(ft.Container):
             padding=20,
             border_radius=12,
             bgcolor=bg_colors[bg_idx],
-            border=ft.border.all(1, ft.Colors.with_opacity(0.08, ft.Colors.WHITE)),
+            border=ft.Border.all(1, ft.Colors.with_opacity(0.08, ft.Colors.WHITE)),
             on_click=lambda _, p=project: self.navigate("project", p.get("id")),
             ink=True,
             content=ft.Column(

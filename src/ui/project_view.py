@@ -80,7 +80,7 @@ class ProjectView(ft.Container):
         self.upload_zone = ft.Container(
             padding=30,
             border_radius=12,
-            border=ft.border.all(2, ft.Colors.with_opacity(0.15, ft.Colors.BLUE), "dashed"),
+            border=ft.Border.all(2, ft.Colors.with_opacity(0.15, ft.Colors.BLUE), "dashed"),
             bgcolor=ft.Colors.with_opacity(0.04, ft.Colors.BLUE),
             content=ft.Column(
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -145,7 +145,7 @@ class ProjectView(ft.Container):
                     expand=True,
                     padding=10,
                     border_radius=12,
-                    border=ft.border.all(1, ft.Colors.with_opacity(0.08, ft.Colors.WHITE)),
+                    border=ft.Border.all(1, ft.Colors.with_opacity(0.08, ft.Colors.WHITE)),
                     content=self.chat_history,
                 ),
                 ft.Row(
@@ -214,7 +214,7 @@ class ProjectView(ft.Container):
             padding=12,
             border_radius=8,
             bgcolor=ft.Colors.with_opacity(0.04, ft.Colors.WHITE),
-            border=ft.border.all(1, ft.Colors.with_opacity(0.06, ft.Colors.WHITE)),
+            border=ft.Border.all(1, ft.Colors.with_opacity(0.06, ft.Colors.WHITE)),
             content=ft.Row(
                 controls=[
                     ft.Icon(icon, color=ft.Colors.BLUE_400, size=20),
@@ -226,7 +226,7 @@ class ProjectView(ft.Container):
                                 spacing=10,
                                 controls=[
                                     ft.Container(
-                                        padding=ft.padding.symmetric(horizontal=6, vertical=2),
+                                        padding=ft.Padding.symmetric(horizontal=6, vertical=2),
                                         border_radius=6,
                                         bgcolor=ft.Colors.with_opacity(0.15, status_color),
                                         content=ft.Text(status.capitalize(), size=10, color=status_color),

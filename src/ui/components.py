@@ -54,7 +54,7 @@ def status_badge(status: str) -> ft.Container:
         content=ft.Text(status.upper(), size=11, weight=ft.FontWeight.W_600, color=color),
         bgcolor=ft.colors.with_opacity(0.15, color),
         border_radius=12,
-        padding=ft.padding.symmetric(horizontal=10, vertical=4),
+        padding=ft.Padding.symmetric(horizontal=10, vertical=4),
     )
 
 
@@ -79,7 +79,7 @@ def card(
         width=width,
         height=height,
         expand=expand,
-        border=ft.border.all(1, BORDER_COLOR),
+        border=ft.Border.all(1, BORDER_COLOR),
         animate=ft.animation.Animation(200, ft.AnimationCurve.EASE_IN_OUT) if on_click else None,
     )
 
@@ -367,6 +367,6 @@ def code_block(code: str, max_height: float = 300) -> ft.Container:
         bgcolor="#0d1117",
         border_radius=8,
         padding=16,
-        border=ft.border.all(1, BORDER_COLOR),
+        border=ft.Border.all(1, BORDER_COLOR),
         height=max_height,
     )

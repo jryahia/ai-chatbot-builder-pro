@@ -46,7 +46,7 @@ class ChatPanel(ft.Container):
             controls=[
                 # Header
                 ft.Container(
-                    padding=ft.padding.symmetric(horizontal=16, vertical=12),
+                    padding=ft.Padding.symmetric(horizontal=16, vertical=12),
                     border_radius=10,
                     bgcolor=ft.Colors.with_opacity(0.04, ft.Colors.WHITE),
                     content=ft.Row(
@@ -69,15 +69,15 @@ class ChatPanel(ft.Container):
                     expand=True,
                     padding=10,
                     border_radius=10,
-                    border=ft.border.all(1, ft.Colors.with_opacity(0.08, ft.Colors.WHITE)),
+                    border=ft.Border.all(1, ft.Colors.with_opacity(0.08, ft.Colors.WHITE)),
                     bgcolor=ft.Colors.with_opacity(0.02, ft.Colors.WHITE),
                     content=self.chat_area,
                 ),
                 # Input bar
                 ft.Container(
-                    padding=ft.padding.symmetric(horizontal=4, vertical=4),
+                    padding=ft.Padding.symmetric(horizontal=4, vertical=4),
                     border_radius=10,
-                    border=ft.border.all(1, ft.Colors.with_opacity(0.1, ft.Colors.WHITE)),
+                    border=ft.Border.all(1, ft.Colors.with_opacity(0.1, ft.Colors.WHITE)),
                     bgcolor=ft.Colors.with_opacity(0.04, ft.Colors.WHITE),
                     content=ft.Row(
                         controls=[
@@ -191,7 +191,7 @@ class ChatPanel(ft.Container):
                 score = s.get("score", s.get("relevance", 0))
                 source_items.append(
                     ft.Container(
-                        padding=ft.padding.symmetric(horizontal=8, vertical=4),
+                        padding=ft.Padding.symmetric(horizontal=8, vertical=4),
                         border_radius=4,
                         bgcolor=ft.Colors.with_opacity(0.08, ft.Colors.BLUE),
                         content=ft.Text(

@@ -166,7 +166,7 @@ async def main(page: ft.Page) -> None:
                             content=ft.Text("PRO", size=10, weight=ft.FontWeight.BOLD, color=ACCENT),
                             bgcolor=ft.colors.with_opacity(0.15, ACCENT),
                             border_radius=4,
-                            padding=ft.padding.symmetric(horizontal=6, vertical=2),
+                            padding=ft.Padding.symmetric(horizontal=6, vertical=2),
                         ),
                     ],
                     spacing=10,
@@ -182,8 +182,8 @@ async def main(page: ft.Page) -> None:
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
         ),
         bgcolor=SURFACE,
-        padding=ft.padding.symmetric(horizontal=20, vertical=12),
-        border=ft.border.only(bottom=ft.BorderSide(1, ft.colors.with_opacity(0.08, ft.colors.WHITE))),
+        padding=ft.Padding.symmetric(horizontal=20, vertical=12),
+        border=ft.Border.only(bottom=ft.BorderSide(1, ft.colors.with_opacity(0.08, ft.colors.WHITE))),
     )
 
     layout = ft.Column(

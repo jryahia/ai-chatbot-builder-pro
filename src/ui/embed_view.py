@@ -68,15 +68,15 @@ class EmbedView:
         # Controls that update reactively
         self._primary_preview = ft.Container(
             width=32, height=32, bgcolor=self.primary_color, border_radius=6,
-            border=ft.border.all(1, BORDER_COLOR),
+            border=ft.Border.all(1, BORDER_COLOR),
         )
         self._bg_preview = ft.Container(
             width=32, height=32, bgcolor=self.widget_bg_color, border_radius=6,
-            border=ft.border.all(1, BORDER_COLOR),
+            border=ft.Border.all(1, BORDER_COLOR),
         )
         self._text_preview = ft.Container(
             width=32, height=32, bgcolor=self.widget_text_color, border_radius=6,
-            border=ft.border.all(1, BORDER_COLOR),
+            border=ft.Border.all(1, BORDER_COLOR),
         )
         self._questions_column = ft.Column(spacing=8, controls=[])
         self._api_keys_column = ft.Column(spacing=8, controls=[])
@@ -236,8 +236,8 @@ class EmbedView:
                     ),
                     bgcolor=ft.colors.with_opacity(0.05, ft.colors.WHITE),
                     border_radius=8,
-                    padding=ft.padding.symmetric(horizontal=12, vertical=6),
-                    border=ft.border.all(1, BORDER_COLOR),
+                    padding=ft.Padding.symmetric(horizontal=12, vertical=6),
+                    border=ft.Border.all(1, BORDER_COLOR),
                 )
             )
         self._questions_column.update()
@@ -422,7 +422,7 @@ class EmbedView:
                                         SUCCESS if key.get("is_active") else ERROR,
                                     ),
                                     border_radius=10,
-                                    padding=ft.padding.symmetric(horizontal=8, vertical=3),
+                                    padding=ft.Padding.symmetric(horizontal=8, vertical=3),
                                 ),
                                 ft.IconButton(
                                     icon=ft.icons.DELETE_OUTLINE,
@@ -437,8 +437,8 @@ class EmbedView:
                         ),
                         bgcolor=ft.colors.with_opacity(0.04, ft.colors.WHITE),
                         border_radius=10,
-                        padding=ft.padding.symmetric(horizontal=16, vertical=12),
-                        border=ft.border.all(1, BORDER_COLOR),
+                        padding=ft.Padding.symmetric(horizontal=16, vertical=12),
+                        border=ft.Border.all(1, BORDER_COLOR),
                     )
                 )
         self._api_keys_column.update()
@@ -605,7 +605,7 @@ class EmbedView:
                         bgcolor="#0d1117",
                         border_radius=8,
                         padding=14,
-                        border=ft.border.all(1, BORDER_COLOR),
+                        border=ft.Border.all(1, BORDER_COLOR),
                         height=80,
                     ),
                     ft.Container(height=8),
@@ -624,7 +624,7 @@ class EmbedView:
                         bgcolor="#0d1117",
                         border_radius=8,
                         padding=14,
-                        border=ft.border.all(1, BORDER_COLOR),
+                        border=ft.Border.all(1, BORDER_COLOR),
                         height=80,
                     ),
                 ],
@@ -688,7 +688,7 @@ class EmbedView:
                         ],
                         spacing=8,
                     ),
-                    padding=ft.padding.only(bottom=16),
+                    padding=ft.Padding.only(bottom=16),
                 ),
                 ft.Row(
                     [

@@ -530,7 +530,7 @@ async def chat_stream(
         elapsed_ms = int((time.time() - start_time) * 1000)
         tokens_out = len(content) // 4
 
-        async from src.database import db_session
+        from src.database import db_session
         async with db_session() as session:
             bot_msg = Message(
                 id=msg_id,
