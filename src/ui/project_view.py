@@ -21,6 +21,9 @@ class ProjectView(ft.Container):
     def api_client(self, path: str, method: str = "GET", **kwargs) -> any:
         """Synchronous HTTP helper — calls the API via httpx."""
         import httpx
+        # Map legacy paths to v1 API routes
+        if path.startswith("/api/") and not path.startswith("/api/v1/"):
+            path = path.replace("/api/", "/api/v1/", 1)
         url = f"{self.api_base}{path}"
         try:
             if method == "GET":

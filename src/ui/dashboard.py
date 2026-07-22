@@ -15,31 +15,6 @@ class DashboardView(ft.Container):
         self.projects = []
         self.loading = ft.ProgressRing(visible=False)
 
-    def api_client(self, path: str, method: str = "GET", **kwargs) -> any:
-        """Synchronous HTTP helper — calls the API via httpx."""
-        import httpx
-        url = f"{self.api_base}{path}"
-        try:
-            if method == "GET":
-                r = httpx.get(url, timeout=10)
-            elif method == "POST":
-                r = httpx.post(url, json=kwargs.get("json"), timeout=10)
-            elif method == "DELETE":
-                r = httpx.delete(url, timeout=10)
-            elif method == "PUT":
-                r = httpx.put(url, json=kwargs.get("json"), timeout=10)
-            else:
-                return None
-            r.raise_for_status()
-            return r.json()
-        except Exception:
-            return None
-
-    def navigate(self, route: str, project_id: Optional[str] = None) -> None:
-        """Delegate navigation to the parent app's handler."""
-        if self.on_navigate:
-            self.on_navigate(route, project_id)
-
         # Create project dialog fields
         self.project_name = ft.TextField(
             label="Project Name",
@@ -98,6 +73,34 @@ class DashboardView(ft.Container):
             run_spacing=15,
             padding=0,
         )
+
+    def api_client(self, path: str, method: str = "GET", **kwargs) -> any:
+        """Synchronous HTTP helper — calls the API via httpx."""
+        import httpx
+        # Map legacy paths to v1 API routes
+        if path.startswith("/api/") and not path.startswith("/api/v1/"):
+            path = path.replace("/api/", "/api/v1/", 1)
+        url = f"{self.api_base}{path}"
+        try:
+            if method == "GET":
+                r = httpx.get(url, timeout=10)
+            elif method == "POST":
+                r = httpx.post(url, json=kwargs.get("json"), timeout=10)
+            elif method == "DELETE":
+                r = httpx.delete(url, timeout=10)
+            elif method == "PUT":
+                r = httpx.put(url, json=kwargs.get("json"), timeout=10)
+            else:
+                return None
+            r.raise_for_status()
+            return r.json()
+        except Exception:
+            return None
+
+    def navigate(self, route: str, project_id: Optional[str] = None) -> None:
+        """Delegate navigation to the parent app's handler."""
+        if self.on_navigate:
+            self.on_navigate(route, project_id)
 
     async def build(self):
         """Return the dashboard container for rendering."""
