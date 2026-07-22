@@ -101,8 +101,7 @@ class DashboardView(ft.Container):
 
     async def build(self):
         """Return the dashboard container for rendering."""
-        return self
-
+        # Build content on first call
         self.content = ft.Container(
             padding=20,
             content=ft.Column(
@@ -137,6 +136,7 @@ class DashboardView(ft.Container):
                 ],
             ),
         )
+        return self
 
     def did_mount(self):
         self._load_projects()
