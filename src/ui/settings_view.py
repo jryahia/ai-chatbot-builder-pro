@@ -34,9 +34,10 @@ TEXT_SECONDARY = "#94a3b8"
 class SettingsView(ft.Column):
     """Settings page with tabs for API keys, models, appearance, data, and system."""
 
-    def __init__(self, page: ft.Page) -> None:
+    def __init__(self, page: ft.Page, api_base: str = "") -> None:
         super().__init__()
-        self.page = page
+        self._page = page
+        self.api_base = api_base
         self.spacing = 20
         self.scroll = ft.ScrollMode.AUTO
         self.expand = True
@@ -156,20 +157,45 @@ class SettingsView(ft.Column):
             label_style=ft.TextStyle(color=TEXT_SECONDARY, size=13),
         )
 
-        # Build tabs
+        # Build tabs — Flet 0.86 TabBar + TabBarView
+        self._api_keys_tab = self._build_api_keys_tab()
+        self._model_tab = self._build_model_tab()
+        self._appearance_tab = self._build_appearance_tab()
+        self._data_tab = self._build_data_tab()
+        self._system_tab = self._build_system_tab()
+
         self.tabs = ft.Tabs(
             selected_index=0,
             animation_duration=300,
-            tabs=[
-                ft.Tab(text="API Keys", content=self._build_api_keys_tab()),
-                ft.Tab(text="Model Settings", content=self._build_model_tab()),
-                ft.Tab(text="Appearance", content=self._build_appearance_tab()),
-                ft.Tab(text="Data Management", content=self._build_data_tab()),
-                ft.Tab(text="System", content=self._build_system_tab()),
-            ],
-            label_color=ACCENT_BLUE,
-            unselected_label_color=TEXT_SECONDARY,
-            indicator_color=ACCENT_BLUE,
+            length=5,
+            expand=True,
+            content=ft.Column(
+                expand=True,
+                controls=[
+                    ft.TabBar(
+                        label_color=ACCENT_BLUE,
+                        unselected_label_color=TEXT_SECONDARY,
+                        indicator_color=ACCENT_BLUE,
+                        tabs=[
+                            ft.Tab(label="API Keys"),
+                            ft.Tab(label="Model Settings"),
+                            ft.Tab(label="Appearance"),
+                            ft.Tab(label="Data Management"),
+                            ft.Tab(label="System"),
+                        ],
+                    ),
+                    ft.TabBarView(
+                        expand=True,
+                        controls=[
+                            self._api_keys_tab,
+                            self._model_tab,
+                            self._appearance_tab,
+                            self._data_tab,
+                            self._system_tab,
+                        ],
+                    ),
+                ],
+            ),
         )
 
         self.controls = [
@@ -184,7 +210,7 @@ class SettingsView(ft.Column):
         return ft.Container(
             content=ft.Column(
                 [
-                    ft.Text(title, size=18, weight=ft.FontWeight.SEMIBOLD, color=TEXT_PRIMARY),
+                    ft.Text(title, size=18, weight=ft.FontWeight.W_600, color=TEXT_PRIMARY),
                     ft.Divider(height=1, color="rgba(255,255,255,0.06)"),
                     *controls,
                 ],
@@ -339,13 +365,13 @@ class SettingsView(ft.Column):
             save_api_key("openai", self._openai_key.value or "")
             save_api_key("anthropic", self._anthropic_key.value or "")
             save_api_key("google", self._google_key.value or "")
-            self.page.snack_bar = toast("API keys saved securely!")
-            self.page.snack_bar.open = True
+            self._page.snack_bar = toast("API keys saved securely!")
+            self._page.snack_bar.open = True
             self.update()
         except Exception as ex:
             logger.error("Failed to save API keys", error=str(ex))
-            self.page.snack_bar = toast(f"Failed to save keys: {ex}")
-            self.page.snack_bar.open = True
+            self._page.snack_bar = toast(f"Failed to save keys: {ex}")
+            self._page.snack_bar.open = True
             self.update()
 
     def _save_model_settings(self, e: ft.ControlEvent | None = None) -> None:
@@ -354,13 +380,13 @@ class SettingsView(ft.Column):
             from src.config import settings
             settings.default_model = self._default_model.value
             settings.temperature = self._temperature.value
-            self.page.snack_bar = toast("Model settings saved!")
-            self.page.snack_bar.open = True
+            self._page.snack_bar = toast("Model settings saved!")
+            self._page.snack_bar.open = True
             self.update()
         except Exception as ex:
             logger.error("Failed to save model settings", error=str(ex))
-            self.page.snack_bar = toast(f"Failed: {ex}")
-            self.page.snack_bar.open = True
+            self._page.snack_bar = toast(f"Failed: {ex}")
+            self._page.snack_bar.open = True
             self.update()
 
     def _save_appearance(self, e: ft.ControlEvent | None = None) -> None:
@@ -370,13 +396,13 @@ class SettingsView(ft.Column):
             settings.dark_mode = self._theme_toggle.value
             settings.font_size = int(self._font_size.value)
             settings.layout_density = self._layout_density.value
-            self.page.snack_bar = toast("Appearance settings saved!")
-            self.page.snack_bar.open = True
+            self._page.snack_bar = toast("Appearance settings saved!")
+            self._page.snack_bar.open = True
             self.update()
         except Exception as ex:
             logger.error("Failed to save appearance", error=str(ex))
-            self.page.snack_bar = toast(f"Failed: {ex}")
-            self.page.snack_bar.open = True
+            self._page.snack_bar = toast(f"Failed: {ex}")
+            self._page.snack_bar.open = True
             self.update()
 
     def _save_system_settings(self, e: ft.ControlEvent | None = None) -> None:
@@ -386,20 +412,20 @@ class SettingsView(ft.Column):
             settings.auto_start = self._auto_start.value
             settings.server_port = int(self._port.value)
             settings.log_level = self._log_level.value
-            self.page.snack_bar = toast("System settings saved!")
-            self.page.snack_bar.open = True
+            self._page.snack_bar = toast("System settings saved!")
+            self._page.snack_bar.open = True
             self.update()
         except Exception as ex:
             logger.error("Failed to save system settings", error=str(ex))
-            self.page.snack_bar = toast(f"Failed: {ex}")
-            self.page.snack_bar.open = True
+            self._page.snack_bar = toast(f"Failed: {ex}")
+            self._page.snack_bar.open = True
             self.update()
 
     def _toggle_theme(self, e: ft.ControlEvent | None = None) -> None:
         """Toggle between dark and light theme."""
         is_dark = self._theme_toggle.value
-        self.page.theme_mode = ft.ThemeMode.DARK if is_dark else ft.ThemeMode.LIGHT
-        self.page.update()
+        self._page.theme_mode = ft.ThemeMode.DARK if is_dark else ft.ThemeMode.LIGHT
+        self._page.update()
 
     def _export_projects(self, e: ft.ControlEvent | None = None) -> None:
         """Export all projects as JSON."""
@@ -409,13 +435,13 @@ class SettingsView(ft.Column):
             path = "/tmp/chatbot_projects_export.json"
             with open(path, "w") as f:
                 json.dump(data, f, indent=2, default=str)
-            self.page.snack_bar = toast(f"Exported to {path}")
-            self.page.snack_bar.open = True
+            self._page.snack_bar = toast(f"Exported to {path}")
+            self._page.snack_bar.open = True
             self.update()
         except Exception as ex:
             logger.error("Export failed", error=str(ex))
-            self.page.snack_bar = toast(f"Export failed: {ex}")
-            self.page.snack_bar.open = True
+            self._page.snack_bar = toast(f"Export failed: {ex}")
+            self._page.snack_bar.open = True
             self.update()
 
     def _import_projects(self, e: ft.ControlEvent | None = None) -> None:
@@ -426,35 +452,35 @@ class SettingsView(ft.Column):
                     path = result.files[0].path
                     from src.export import import_projects
                     count = import_projects(path)
-                    self.page.snack_bar = toast(f"Imported {count} projects!")
-                    self.page.snack_bar.open = True
+                    self._page.snack_bar = toast(f"Imported {count} projects!")
+                    self._page.snack_bar.open = True
                     self.update()
                 except Exception as ex:
                     logger.error("Import failed", error=str(ex))
-                    self.page.snack_bar = toast(f"Import failed: {ex}")
-                    self.page.snack_bar.open = True
+                    self._page.snack_bar = toast(f"Import failed: {ex}")
+                    self._page.snack_bar.open = True
                     self.update()
 
         file_picker = ft.FilePicker(on_result=on_file_result)
-        self.page.overlay.append(file_picker)
-        self.page.update()
+        self._page.overlay.append(file_picker)
+        self._page.update()
         file_picker.pick_files(allow_multiple=False, file_type=ft.FilePickerFileType.CUSTOM, allowed_extensions=["json"])
 
     def _confirm_clear_data(self, e: ft.ControlEvent | None = None) -> None:
         """Show confirmation dialog before clearing all data."""
         def on_confirm(e: ft.ControlEvent | None = None) -> None:
             dlg.open = False
-            self.page.update()
+            self._page.update()
             try:
                 from src.export import clear_all_data
                 clear_all_data()
-                self.page.snack_bar = toast("All data cleared successfully!")
-                self.page.snack_bar.open = True
+                self._page.snack_bar = toast("All data cleared successfully!")
+                self._page.snack_bar.open = True
                 self.update()
             except Exception as ex:
                 logger.error("Clear data failed", error=str(ex))
-                self.page.snack_bar = toast(f"Failed: {ex}")
-                self.page.snack_bar.open = True
+                self._page.snack_bar = toast(f"Failed: {ex}")
+                self._page.snack_bar.open = True
                 self.update()
 
         dlg = ft.AlertDialog(
@@ -465,11 +491,11 @@ class SettingsView(ft.Column):
                 color=TEXT_SECONDARY,
             ),
             actions=[
-                ft.TextButton("Cancel", on_click=lambda e: (setattr(dlg, 'open', False), self.page.update())),
+                ft.TextButton("Cancel", on_click=lambda e: (setattr(dlg, 'open', False), self._page.update())),
                 ft.TextButton("Delete Everything", style=ft.ButtonStyle(color=ACCENT_RED), on_click=on_confirm),
             ],
             bgcolor=DARK_SURFACE,
         )
-        self.page.dialog = dlg
+        self._page.dialog = dlg
         dlg.open = True
-        self.page.update()
+        self._page.update()

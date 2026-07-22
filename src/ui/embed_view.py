@@ -40,7 +40,7 @@ class EmbedView:
         project_id: str,
         navigate: Callable[[str, Optional[str]], None],
     ) -> None:
-        self.page = page
+        self._page = page
         self.project_id = project_id
         self.navigate = navigate
         self.api_base = settings.api_base_url
@@ -95,13 +95,13 @@ class EmbedView:
             selectable=True,
         )
         self._copy_script_btn = ft.IconButton(
-            icon=ft.icons.COPY_OUTLINED,
+            icon=ft.Icons.COPY_OUTLINED,
             tooltip="Copy script tag",
             icon_color=TEXT2,
             on_click=self._copy_script,
         )
         self._copy_iframe_btn = ft.IconButton(
-            icon=ft.icons.COPY_OUTLINED,
+            icon=ft.Icons.COPY_OUTLINED,
             tooltip="Copy iframe tag",
             icon_color=TEXT2,
             on_click=self._copy_iframe,
@@ -185,11 +185,11 @@ class EmbedView:
                 self.suggested_questions.append(question)
                 self._refresh_questions()
             dlg.open = False
-            self.page.update()
+            self._page.update()
 
         def _cancel(_: ft.ControlEvent) -> None:
             dlg.open = False
-            self.page.update()
+            self._page.update()
 
         dlg = ft.AlertDialog(
             modal=True,
@@ -199,15 +199,15 @@ class EmbedView:
             actions=[
                 ft.TextButton("Cancel", on_click=_cancel, style=ft.ButtonStyle(color=TEXT2)),
                 ft.ElevatedButton(
-                    "Add", on_click=_confirm, bgcolor=ACCENT, color=ft.colors.WHITE,
+                    "Add", on_click=_confirm, bgcolor=ACCENT, color=ft.Colors.WHITE,
                 ),
             ],
             actions_alignment=ft.MainAxisAlignment.END,
             shape=ft.RoundedRectangleBorder(radius=12),
         )
-        self.page.dialog = dlg
+        self._page.dialog = dlg
         dlg.open = True
-        self.page.update()
+        self._page.update()
 
     def _remove_question(self, question: str) -> None:
         if question in self.suggested_questions:
@@ -222,10 +222,10 @@ class EmbedView:
                 ft.Container(
                     content=ft.Row(
                         [
-                            ft.Icon(ft.icons.CHAT_BUBBLE_OUTLINE, size=16, color=TEXT2),
+                            ft.Icon(ft.Icons.CHAT_BUBBLE_OUTLINE, size=16, color=TEXT2),
                             ft.Text(q, size=13, color=TEXT, expand=True),
                             ft.IconButton(
-                                icon=ft.icons.CLOSE,
+                                icon=ft.Icons.CLOSE,
                                 icon_size=16,
                                 icon_color=ERROR,
                                 tooltip="Remove",
@@ -234,7 +234,7 @@ class EmbedView:
                         ],
                         spacing=8,
                     ),
-                    bgcolor=ft.colors.with_opacity(0.05, ft.colors.WHITE),
+                    bgcolor=ft.Colors.with_opacity(0.05, ft.Colors.WHITE),
                     border_radius=8,
                     padding=ft.Padding.symmetric(horizontal=12, vertical=6),
                     border=ft.Border.all(1, BORDER_COLOR),
@@ -302,17 +302,17 @@ class EmbedView:
             read_only=True,
             password=False,
             text_style=ft.TextStyle(color=SUCCESS, font_family="monospace", size=12),
-            bgcolor=ft.colors.with_opacity(0.05, ft.colors.WHITE),
+            bgcolor=ft.Colors.with_opacity(0.05, ft.Colors.WHITE),
             border_color=BORDER_COLOR,
             border_radius=8,
         )
 
         def _close(_: ft.ControlEvent) -> None:
             dlg.open = False
-            self.page.update()
+            self._page.update()
 
         async def _copy_key(_: ft.ControlEvent) -> None:
-            await self.page.set_clipboard_async(raw_key)
+            await self._page.set_clipboard_async(raw_key)
             show_success(self.page, "API key copied to clipboard!")
 
         dlg = ft.AlertDialog(
@@ -325,10 +325,10 @@ class EmbedView:
                     key_field,
                     ft.ElevatedButton(
                         "Copy to Clipboard",
-                        icon=ft.icons.COPY,
+                        icon=ft.Icons.COPY,
                         on_click=_copy_key,
                         bgcolor=ACCENT,
-                        color=ft.colors.WHITE,
+                        color=ft.Colors.WHITE,
                         width=200,
                     ),
                 ],
@@ -339,9 +339,9 @@ class EmbedView:
             actions_alignment=ft.MainAxisAlignment.END,
             shape=ft.RoundedRectangleBorder(radius=12),
         )
-        self.page.dialog = dlg
+        self._page.dialog = dlg
         dlg.open = True
-        self.page.update()
+        self._page.update()
 
     async def _revoke_api_key(self, key_id: str) -> None:
         try:
@@ -357,14 +357,14 @@ class EmbedView:
 
     async def _copy_script(self, e: ft.ControlEvent) -> None:
         if self.script_tag:
-            await self.page.set_clipboard_async(self.script_tag)
+            await self._page.set_clipboard_async(self.script_tag)
             show_success(self.page, "Script tag copied!")
         else:
             show_error(self.page, "Generate embed code first.")
 
     async def _copy_iframe(self, e: ft.ControlEvent) -> None:
         if self.iframe_tag:
-            await self.page.set_clipboard_async(self.iframe_tag)
+            await self._page.set_clipboard_async(self.iframe_tag)
             show_success(self.page, "Iframe tag copied!")
         else:
             show_error(self.page, "Generate embed code first.")
@@ -396,7 +396,7 @@ class EmbedView:
                     ft.Container(
                         content=ft.Row(
                             [
-                                ft.Icon(ft.icons.KEY_OUTLINED, size=18, color=ACCENT),
+                                ft.Icon(ft.Icons.KEY_OUTLINED, size=18, color=ACCENT),
                                 ft.Column(
                                     [
                                         ft.Text(key["name"], size=14, weight=ft.FontWeight.W_500, color=TEXT),
@@ -417,7 +417,7 @@ class EmbedView:
                                         weight=ft.FontWeight.W_600,
                                         color=SUCCESS if key.get("is_active") else ERROR,
                                     ),
-                                    bgcolor=ft.colors.with_opacity(
+                                    bgcolor=ft.Colors.with_opacity(
                                         0.12,
                                         SUCCESS if key.get("is_active") else ERROR,
                                     ),
@@ -425,17 +425,17 @@ class EmbedView:
                                     padding=ft.Padding.symmetric(horizontal=8, vertical=3),
                                 ),
                                 ft.IconButton(
-                                    icon=ft.icons.DELETE_OUTLINE,
+                                    icon=ft.Icons.DELETE_OUTLINE,
                                     icon_color=ERROR,
                                     tooltip="Revoke key",
-                                    on_click=lambda _, kid=key_id: self.page.run_task(
+                                    on_click=lambda _, kid=key_id: self._page.run_task(
                                         self._revoke_api_key, kid
                                     ),
                                 ),
                             ],
                             spacing=12,
                         ),
-                        bgcolor=ft.colors.with_opacity(0.04, ft.colors.WHITE),
+                        bgcolor=ft.Colors.with_opacity(0.04, ft.Colors.WHITE),
                         border_radius=10,
                         padding=ft.Padding.symmetric(horizontal=16, vertical=12),
                         border=ft.Border.all(1, BORDER_COLOR),
@@ -525,7 +525,7 @@ class EmbedView:
                     section_header(
                         "Suggested Questions",
                         trailing=ft.IconButton(
-                            icon=ft.icons.ADD_CIRCLE_OUTLINE,
+                            icon=ft.Icons.ADD_CIRCLE_OUTLINE,
                             icon_color=ACCENT,
                             tooltip="Add question",
                             on_click=self._add_question,
@@ -559,8 +559,8 @@ class EmbedView:
                             ft.Container(width=12),
                             primary_button(
                                 "Generate Key",
-                                on_click=lambda e: self.page.run_task(self._create_api_key, e),
-                                icon=ft.icons.KEY,
+                                on_click=lambda e: self._page.run_task(self._create_api_key, e),
+                                icon=ft.Icons.KEY,
                             ),
                         ],
                         vertical_alignment=ft.CrossAxisAlignment.CENTER,
@@ -579,8 +579,8 @@ class EmbedView:
                         "Embed Code",
                         trailing=primary_button(
                             "Generate",
-                            on_click=lambda e: self.page.run_task(self._generate_embed_code, e),
-                            icon=ft.icons.CODE,
+                            on_click=lambda e: self._page.run_task(self._generate_embed_code, e),
+                            icon=ft.Icons.CODE,
                         ),
                     ),
                     ft.Container(height=4),
@@ -636,7 +636,7 @@ class EmbedView:
     # ─── Public Build ─────────────────────────────────────────────────────────
 
     def build(self) -> ft.Control:
-        self.page.run_task(self._load_api_keys)
+        self._page.run_task(self._load_api_keys)
 
         left_col = ft.Column(
             [
@@ -667,7 +667,7 @@ class EmbedView:
                     content=ft.Row(
                         [
                             ft.IconButton(
-                                icon=ft.icons.ARROW_BACK,
+                                icon=ft.Icons.ARROW_BACK,
                                 icon_color=TEXT2,
                                 tooltip="Back to project",
                                 on_click=lambda _: self.navigate("/project", self.project_id),

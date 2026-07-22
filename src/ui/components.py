@@ -17,7 +17,7 @@ ERROR = "#ef4444"
 TEXT = "#f1f5f9"
 TEXT2 = "#94a3b8"
 BORDER = "rgba(255,255,255,0.08)"
-BORDER_COLOR = ft.colors.with_opacity(0.08, ft.colors.WHITE)
+BORDER_COLOR = ft.Colors.with_opacity(0.08, ft.Colors.WHITE)
 
 
 # ─── Typography ───────────────────────────────────────────────────────────────
@@ -52,7 +52,7 @@ def status_badge(status: str) -> ft.Container:
     color = _STATUS_COLORS.get(status, TEXT2)
     return ft.Container(
         content=ft.Text(status.upper(), size=11, weight=ft.FontWeight.W_600, color=color),
-        bgcolor=ft.colors.with_opacity(0.15, color),
+        bgcolor=ft.Colors.with_opacity(0.15, color),
         border_radius=12,
         padding=ft.Padding.symmetric(horizontal=10, vertical=4),
     )
@@ -80,7 +80,7 @@ def card(
         height=height,
         expand=expand,
         border=ft.Border.all(1, BORDER_COLOR),
-        animate=ft.animation.Animation(200, ft.AnimationCurve.EASE_IN_OUT) if on_click else None,
+        animate=ft.Animation(200, ft.AnimationCurve.EASE_IN_OUT) if on_click else None,
     )
 
 
@@ -100,22 +100,22 @@ def card_hover(
 
 def primary_button(text: str, on_click: Callable, icon: Optional[str] = None, width: Optional[float] = None) -> ft.ElevatedButton:
     return ft.ElevatedButton(
-        text=text,
+        content=ft.Text(text),
         icon=icon,
         on_click=on_click,
         bgcolor=ACCENT,
-        color=ft.colors.WHITE,
+        color=ft.Colors.WHITE,
         width=width,
         style=ft.ButtonStyle(
             shape=ft.RoundedRectangleBorder(radius=8),
-            overlay_color=ft.colors.with_opacity(0.1, ft.colors.WHITE),
+            overlay_color=ft.Colors.with_opacity(0.1, ft.Colors.WHITE),
         ),
     )
 
 
 def secondary_button(text: str, on_click: Callable, icon: Optional[str] = None) -> ft.OutlinedButton:
     return ft.OutlinedButton(
-        text=text,
+        content=ft.Text(text),
         icon=icon,
         on_click=on_click,
         style=ft.ButtonStyle(
@@ -128,11 +128,11 @@ def secondary_button(text: str, on_click: Callable, icon: Optional[str] = None) 
 
 def danger_button(text: str, on_click: Callable, icon: Optional[str] = None) -> ft.ElevatedButton:
     return ft.ElevatedButton(
-        text=text,
+        content=ft.Text(text),
         icon=icon,
         on_click=on_click,
         bgcolor=ERROR,
-        color=ft.colors.WHITE,
+        color=ft.Colors.WHITE,
         style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=8)),
     )
 
@@ -172,7 +172,7 @@ def text_field(
         border_color=BORDER_COLOR,
         focused_border_color=ACCENT,
         cursor_color=ACCENT,
-        bgcolor=ft.colors.with_opacity(0.05, ft.colors.WHITE),
+        bgcolor=ft.Colors.with_opacity(0.05, ft.Colors.WHITE),
         border_radius=8,
     )
 
@@ -194,7 +194,7 @@ def dropdown(
         text_style=ft.TextStyle(color=TEXT),
         border_color=BORDER_COLOR,
         focused_border_color=ACCENT,
-        bgcolor=ft.colors.with_opacity(0.05, ft.colors.WHITE),
+        bgcolor=ft.Colors.with_opacity(0.05, ft.Colors.WHITE),
         border_radius=8,
     )
 
@@ -216,7 +216,7 @@ def progress_bar(value: Optional[float] = None, color: str = ACCENT) -> ft.Progr
     return ft.ProgressBar(
         value=value,
         color=color,
-        bgcolor=ft.colors.with_opacity(0.1, color),
+        bgcolor=ft.Colors.with_opacity(0.1, color),
         height=6,
         border_radius=3,
     )
@@ -226,7 +226,7 @@ def progress_bar(value: Optional[float] = None, color: str = ACCENT) -> ft.Progr
 
 def show_toast(page: ft.Page, message: str, color: str = SUCCESS) -> None:
     page.snack_bar = ft.SnackBar(
-        content=ft.Text(message, color=ft.colors.WHITE),
+        content=ft.Text(message, color=ft.Colors.WHITE),
         bgcolor=color,
         duration=3000,
     )
@@ -276,7 +276,7 @@ def confirm_dialog(
                 confirm_label,
                 on_click=_confirm,
                 bgcolor=confirm_color,
-                color=ft.colors.WHITE,
+                color=ft.Colors.WHITE,
             ),
         ],
         actions_alignment=ft.MainAxisAlignment.END,
@@ -308,7 +308,7 @@ def stat_card(label_text: str, value: str, icon: str, color: str = ACCENT) -> ft
                     [
                         ft.Container(
                             content=ft.Icon(icon, color=color, size=20),
-                            bgcolor=ft.colors.with_opacity(0.15, color),
+                            bgcolor=ft.Colors.with_opacity(0.15, color),
                             border_radius=8,
                             padding=8,
                         ),
@@ -329,7 +329,42 @@ def divider() -> ft.Divider:
     return ft.Divider(color=BORDER_COLOR, height=1)
 
 
-# ─── Empty State ─────────────────────────────────────────────────────────────
+# ─── Card Surface (like card but with SURFACE bg) ────────────────
+
+def card_surface(
+    content: ft.Control,
+    padding: int = 20,
+    on_click: Optional[Callable] = None,
+    width: Optional[float] = None,
+    height: Optional[float] = None,
+    expand: bool = False,
+) -> ft.Container:
+    return card(content, padding=padding, bgcolor=SURFACE, on_click=on_click, width=width, height=height, expand=expand)
+
+
+# ─── Info Row (label: value) ─────────────────────────────────────
+
+def info_row(label_text: str, value_text: str, value_color: str = TEXT) -> ft.Row:
+    return ft.Row(
+        [
+            ft.Text(label_text, size=13, color=TEXT2, expand=True),
+            ft.Text(value_text, size=13, weight=ft.FontWeight.W_500, color=value_color),
+        ],
+        spacing=8,
+    )
+
+
+# ─── Toast (returns SnackBar object) ─────────────────────────────
+
+def toast(message: str, color: str = SUCCESS) -> ft.SnackBar:
+    return ft.SnackBar(
+        content=ft.Text(message, color=ft.Colors.WHITE),
+        bgcolor=color,
+        duration=3000,
+    )
+
+
+# ─── Empty State ─────────────────────────────────────────────────
 
 def empty_state(icon: str, title_text: str, subtitle_text: str = "", action: Optional[ft.Control] = None) -> ft.Column:
     children: list[ft.Control] = [
@@ -339,7 +374,7 @@ def empty_state(icon: str, title_text: str, subtitle_text: str = "", action: Opt
     if subtitle_text:
         children.append(ft.Text(subtitle_text, size=14, color=TEXT2, text_align=ft.TextAlign.CENTER))
     if action:
-        children.append(ft.Container(content=action, margin=ft.margin.only(top=8)))
+        children.append(ft.Container(content=action, margin=ft.Margin(left=0, right=0, top=8, bottom=0)))
 
     return ft.Column(
         children,

@@ -31,12 +31,9 @@ async def main(page: ft.Page) -> None:
         color_scheme=ft.ColorScheme(
             primary=ACCENT,
             secondary=ACCENT2,
-            surface=SURFACE,
-            background=BG,
-            on_primary=ft.colors.WHITE,
-            on_secondary=ft.colors.WHITE,
-            on_surface=TEXT,
-            on_background=TEXT,
+            on_primary=ft.Colors.WHITE,
+            on_secondary=ft.Colors.WHITE,
+            surface_container_low=SURFACE,
         ),
         text_theme=ft.TextTheme(
             body_large=ft.TextStyle(color=TEXT),
@@ -44,6 +41,7 @@ async def main(page: ft.Page) -> None:
             label_large=ft.TextStyle(color=TEXT),
         ),
     )
+    page.bgcolor = BG
 
     # State
     current_route = "dashboard"
@@ -120,27 +118,27 @@ async def main(page: ft.Page) -> None:
         min_width=80,
         min_extended_width=160,
         bgcolor=SURFACE,
-        indicator_color=ft.colors.with_opacity(0.15, ACCENT),
+        indicator_color=ft.Colors.with_opacity(0.15, ACCENT),
         indicator_shape=ft.RoundedRectangleBorder(radius=8),
         destinations=[
             ft.NavigationRailDestination(
-                icon=ft.icons.DASHBOARD_OUTLINED,
-                selected_icon=ft.icons.DASHBOARD,
+                icon=ft.Icons.DASHBOARD_OUTLINED,
+                selected_icon=ft.Icons.DASHBOARD,
                 label="Dashboard",
             ),
             ft.NavigationRailDestination(
-                icon=ft.icons.BAR_CHART_OUTLINED,
-                selected_icon=ft.icons.BAR_CHART,
+                icon=ft.Icons.BAR_CHART_OUTLINED,
+                selected_icon=ft.Icons.BAR_CHART,
                 label="Analytics",
             ),
             ft.NavigationRailDestination(
-                icon=ft.icons.REFRESH_OUTLINED,
-                selected_icon=ft.icons.REFRESH,
+                icon=ft.Icons.REFRESH_OUTLINED,
+                selected_icon=ft.Icons.REFRESH,
                 label="Refresh",
             ),
             ft.NavigationRailDestination(
-                icon=ft.icons.SETTINGS_OUTLINED,
-                selected_icon=ft.icons.SETTINGS,
+                icon=ft.Icons.SETTINGS_OUTLINED,
+                selected_icon=ft.Icons.SETTINGS,
                 label="Settings",
             ),
         ],
@@ -154,17 +152,17 @@ async def main(page: ft.Page) -> None:
                 ft.Row(
                     [
                         ft.Container(
-                            content=ft.Text("CB", size=14, weight=ft.FontWeight.BOLD, color=ft.colors.WHITE),
+                            content=ft.Text("CB", size=14, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
                             bgcolor=ACCENT,
                             border_radius=8,
                             width=32,
                             height=32,
-                            alignment=ft.alignment.center,
+                            alignment=ft.Alignment.CENTER,
                         ),
                         ft.Text("AI Chatbot Builder", size=16, weight=ft.FontWeight.BOLD, color=TEXT),
                         ft.Container(
                             content=ft.Text("PRO", size=10, weight=ft.FontWeight.BOLD, color=ACCENT),
-                            bgcolor=ft.colors.with_opacity(0.15, ACCENT),
+                            bgcolor=ft.Colors.with_opacity(0.15, ACCENT),
                             border_radius=4,
                             padding=ft.Padding.symmetric(horizontal=6, vertical=2),
                         ),
@@ -183,7 +181,7 @@ async def main(page: ft.Page) -> None:
         ),
         bgcolor=SURFACE,
         padding=ft.Padding.symmetric(horizontal=20, vertical=12),
-        border=ft.Border.only(bottom=ft.BorderSide(1, ft.colors.with_opacity(0.08, ft.colors.WHITE))),
+        border=ft.Border.only(bottom=ft.BorderSide(1, ft.Colors.with_opacity(0.08, ft.Colors.WHITE))),
     )
 
     layout = ft.Column(
@@ -192,7 +190,7 @@ async def main(page: ft.Page) -> None:
             ft.Row(
                 [
                     nav_rail,
-                    ft.VerticalDivider(width=1, color=ft.colors.with_opacity(0.08, ft.colors.WHITE)),
+                    ft.VerticalDivider(width=1, color=ft.Colors.with_opacity(0.08, ft.Colors.WHITE)),
                     content_area,
                 ],
                 expand=True,

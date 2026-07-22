@@ -7,12 +7,38 @@ from typing import Callable, Optional
 class DashboardView(ft.Container):
     """Dashboard showing project grid with creation dialog."""
 
-    def __init__(self, api_client: Callable, navigate: Callable):
+    def __init__(self, page: ft.Page, api_base: str = ""):
         super().__init__()
-        self.api_client = api_client
-        self.navigate = navigate
+        self._page = page
+        self.api_base = api_base
+        self.on_navigate = None
         self.projects = []
         self.loading = ft.ProgressRing(visible=False)
+
+    def api_client(self, path: str, method: str = "GET", **kwargs) -> any:
+        """Synchronous HTTP helper — calls the API via httpx."""
+        import httpx
+        url = f"{self.api_base}{path}"
+        try:
+            if method == "GET":
+                r = httpx.get(url, timeout=10)
+            elif method == "POST":
+                r = httpx.post(url, json=kwargs.get("json"), timeout=10)
+            elif method == "DELETE":
+                r = httpx.delete(url, timeout=10)
+            elif method == "PUT":
+                r = httpx.put(url, json=kwargs.get("json"), timeout=10)
+            else:
+                return None
+            r.raise_for_status()
+            return r.json()
+        except Exception:
+            return None
+
+    def navigate(self, route: str, project_id: Optional[str] = None) -> None:
+        """Delegate navigation to the parent app's handler."""
+        if self.on_navigate:
+            self.on_navigate(route, project_id)
 
         # Create project dialog fields
         self.project_name = ft.TextField(
@@ -73,11 +99,17 @@ class DashboardView(ft.Container):
             padding=0,
         )
 
+    async def build(self):
+        """Return the dashboard container for rendering."""
+        return self
+
         self.content = ft.Container(
-            padding=30,
+            padding=20,
             content=ft.Column(
-                spacing=20,
+                spacing=15,
                 controls=[
+
+
                     ft.Row(
                         controls=[
                             ft.Column(
@@ -181,7 +213,7 @@ class DashboardView(ft.Container):
                                 height=40,
                                 border_radius=10,
                                 bgcolor=ft.Colors.BLUE_700,
-                                alignment=ft.alignment.center,
+                                alignment=ft.Alignment.CENTER,
                                 content=ft.Icon(ft.Icons.SMART_TOY, color=ft.Colors.WHITE, size=20),
                             ),
                             ft.Container(expand=True),
@@ -220,16 +252,16 @@ class DashboardView(ft.Container):
         )
 
     def _open_create_dialog(self, e):
-        self.page.dialog = self.create_dialog
+        self._page.dialog = self.create_dialog
         self.create_dialog.open = True
         self.project_name.value = ""
         self.project_desc.value = ""
         self.system_prompt.value = ""
-        self.page.update()
+        self._page.update()
 
     def _close_dialog(self, e):
         self.create_dialog.open = False
-        self.page.update()
+        self._page.update()
 
     def _create_project(self, e):
         if not self.project_name.value:
@@ -242,7 +274,7 @@ class DashboardView(ft.Container):
         try:
             result = self.api_client("/api/projects", method="POST", json=data)
             self.create_dialog.open = False
-            self.page.update()
+            self._page.update()
             self._load_projects()
         except Exception as ex:
             print(f"Create project failed: {ex}")

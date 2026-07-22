@@ -30,6 +30,7 @@ class Settings(BaseSettings):
 
     # LLM Providers
     openai_api_key: Optional[str] = None
+    openai_base_url: Optional[str] = None
     anthropic_api_key: Optional[str] = None
     google_api_key: Optional[str] = None
     ollama_base_url: str = "http://localhost:11434"

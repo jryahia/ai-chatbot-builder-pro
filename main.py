@@ -8,7 +8,6 @@ import time
 from pathlib import Path
 
 import structlog
-import uvicorn
 
 # Ensure project root is on path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -43,6 +42,8 @@ def _configure_logging() -> None:
 
 def _run_server() -> None:
     """Run the FastAPI server in a background thread."""
+    import asyncio
+    import uvicorn
     from src.api_server import app
 
     config = uvicorn.Config(
@@ -50,17 +51,14 @@ def _run_server() -> None:
         host=settings.api_host,
         port=settings.api_port,
         log_level=settings.log_level,
-        loop="asyncio",
     )
     server = uvicorn.Server(config)
 
-    async def _start():
-        await server.startup()
-        _server_ready.set()
-        await server.main_loop()
-        await server.shutdown()
+    async def _serve():
+        await server.serve()
 
-    asyncio.run(_start())
+    _server_ready.set()
+    asyncio.run(_serve())
 
 
 def _wait_for_server(timeout: float = 30.0) -> bool:
@@ -85,6 +83,7 @@ def main() -> None:
     # Start API server in background thread
     server_thread = threading.Thread(target=_run_server, daemon=True, name="api-server")
     server_thread.start()
+    _server_ready.wait(timeout=5)
 
     logger.info("waiting_for_api_server", port=settings.api_port)
     if not _wait_for_server(30):

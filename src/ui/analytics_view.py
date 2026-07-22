@@ -37,9 +37,9 @@ CHART_COLORS = ["#4f8cff", "#7c5cfc", "#34d399", "#fbbf24", "#ef4444"]
 class AnalyticsView(ft.Column):
     """Analytics dashboard with stats, charts, and export."""
 
-    def __init__(self, page: ft.Page) -> None:
+    def __init__(self, page: ft.Page, api_base: str = "") -> None:
         super().__init__()
-        self.page = page
+        self._page = page
         self.spacing = 20
         self.scroll = ft.ScrollMode.AUTO
         self.expand = True
@@ -58,10 +58,10 @@ class AnalyticsView(ft.Column):
             self._loading_indicator,
             self._stats_cards,
             self._chart_container,
-            ft.Text("Top Questions", size=20, weight=ft.FontWeight.SEMIBOLD, color=TEXT_PRIMARY),
+            ft.Text("Top Questions", size=20, weight=ft.FontWeight.W_600, color=TEXT_PRIMARY),
             self._top_questions,
             ft.Divider(height=1, color="rgba(255,255,255,0.08)"),
-            ft.Text("Response Time Distribution", size=20, weight=ft.FontWeight.SEMIBOLD, color=TEXT_PRIMARY),
+            ft.Text("Response Time Distribution", size=20, weight=ft.FontWeight.W_600, color=TEXT_PRIMARY),
             self._response_times,
             ft.Row(
                 [self._export_btn],
@@ -86,8 +86,8 @@ class AnalyticsView(ft.Column):
         except Exception as e:
             logger.error("Failed to load analytics", error=str(e))
             self._loading_indicator.visible = False
-            self.page.snack_bar = toast(f"Error loading analytics: {e}")
-            self.page.snack_bar.open = True
+            self._page.snack_bar = toast(f"Error loading analytics: {e}")
+            self._page.snack_bar.open = True
             self.update()
 
     def _fetch_stats(self) -> dict[str, Any]:
@@ -134,7 +134,7 @@ class AnalyticsView(ft.Column):
                     border_radius=12,
                     padding=20,
                     width=220,
-                    animate=ft.animation.Animation(300, ft.AnimationCurve.EASE_IN_OUT),
+                    animate=ft.Animation(300, ft.AnimationCurve.EASE_IN_OUT),
                 )
             )
         self._stats_cards.controls = cards
@@ -147,7 +147,7 @@ class AnalyticsView(ft.Column):
                 bgcolor=DARK_CARD,
                 border_radius=12,
                 padding=30,
-                alignment=ft.alignment.center,
+                alignment=ft.Alignment.CENTER,
             )
             return
 
@@ -179,7 +179,7 @@ class AnalyticsView(ft.Column):
         self._chart_container.content = ft.Container(
             content=ft.Column(
                 [
-                    ft.Text("Daily Active Users (Last 14 Days)", size=16, weight=ft.FontWeight.SEMIBOLD, color=TEXT_PRIMARY),
+                    ft.Text("Daily Active Users (Last 14 Days)", size=16, weight=ft.FontWeight.W_600, color=TEXT_PRIMARY),
                     ft.Row(bars, alignment=ft.MainAxisAlignment.SPACE_AROUND, spacing=8),
                 ],
                 spacing=16,
@@ -206,7 +206,7 @@ class AnalyticsView(ft.Column):
                             ft.Container(
                                 content=ft.Text(str(i), size=12, weight=ft.FontWeight.BOLD, color=ACCENT_BLUE),
                                 width=28, height=28, bgcolor=f"{ACCENT_BLUE}20",
-                                border_radius=14, alignment=ft.alignment.center,
+                                border_radius=14, alignment=ft.Alignment.CENTER,
                             ),
                             ft.Column(
                                 [
@@ -256,7 +256,7 @@ class AnalyticsView(ft.Column):
                             height=20,
                             bgcolor=ACCENT_PURPLE,
                             border_radius=4,
-                            animate=ft.animation.Animation(500, ft.AnimationCurve.EASE_OUT),
+                            animate=ft.Animation(500, ft.AnimationCurve.EASE_OUT),
                         ),
                         ft.Text(str(count), size=11, color=TEXT_SECONDARY),
                     ],
@@ -285,14 +285,14 @@ class AnalyticsView(ft.Column):
                 f.write(csv_data)
 
             if self.page and hasattr(self.page, "open_file"):
-                self.page.open_file(save_path)
+                self._page.open_file(save_path)
 
-            self.page.snack_bar = toast("Analytics exported successfully!")
-            self.page.snack_bar.open = True
+            self._page.snack_bar = toast("Analytics exported successfully!")
+            self._page.snack_bar.open = True
             self.update()
         except Exception as e:
             logger.error("Export failed", error=str(e))
             if self.page:
-                self.page.snack_bar = toast(f"Export failed: {e}")
-                self.page.snack_bar.open = True
+                self._page.snack_bar = toast(f"Export failed: {e}")
+                self._page.snack_bar.open = True
                 self.update()

@@ -157,8 +157,8 @@ class ChatPanel(ft.Container):
                     ),
                 ],
             ),
-            margin=ft.margin.only(left=80),
-            animate=ft.animation.Animation(200, ft.AnimationCurve.EASE_OUT),
+            margin=ft.Margin(left=80, right=0, top=0, bottom=0),
+            animate=ft.Animation(200, ft.AnimationCurve.EASE_OUT),
         )
         self.chat_area.controls.append(bubble)
         self._scroll_to_bottom()
@@ -172,7 +172,7 @@ class ChatPanel(ft.Container):
                     ft.Container(
                         width=28, height=28, border_radius=14,
                         bgcolor=ft.Colors.GREEN_700,
-                        alignment=ft.alignment.center,
+                        alignment=ft.Alignment.CENTER,
                         content=ft.Icon(ft.Icons.SMART_TOY, size=16, color=ft.Colors.WHITE),
                     ),
                     ft.Text("Assistant", size=11, color=ft.Colors.GREEN_300, italic=True),
@@ -180,7 +180,7 @@ class ChatPanel(ft.Container):
             ),
             ft.Container(
                 content=ft.Text(text, color=ft.Colors.WHITE, size=14, selectable=True),
-                margin=ft.margin.only(left=36),
+                margin=ft.Margin(left=36, right=0, top=0, bottom=0),
             ),
         ]
 
@@ -205,7 +205,7 @@ class ChatPanel(ft.Container):
                     padding=8,
                     border_radius=6,
                     bgcolor=ft.Colors.with_opacity(0.04, ft.Colors.BLUE),
-                    margin=ft.margin.only(left=36),
+                    margin=ft.Margin(left=36, right=0, top=0, bottom=0),
                     content=ft.Column(
                         spacing=4,
                         controls=[
@@ -220,8 +220,8 @@ class ChatPanel(ft.Container):
             padding=12,
             border_radius=10,
             bgcolor=ft.Colors.with_opacity(0.06, ft.Colors.GREEN),
-            margin=ft.margin.only(right=80),
-            animate=ft.animation.Animation(200, ft.AnimationCurve.EASE_OUT),
+            margin=ft.Margin(left=0, right=80, top=0, bottom=0),
+            animate=ft.Animation(200, ft.AnimationCurve.EASE_OUT),
             content=ft.Column(spacing=6, controls=controls),
         )
         self.chat_area.controls.append(bubble)
@@ -233,7 +233,7 @@ class ChatPanel(ft.Container):
                 padding=12,
                 border_radius=8,
                 bgcolor=ft.Colors.with_opacity(0.08, ft.Colors.RED),
-                margin=ft.margin.only(right=80),
+                margin=ft.Margin(left=0, right=80, top=0, bottom=0),
                 content=ft.Row(
                     controls=[
                         ft.Icon(ft.Icons.ERROR_OUTLINE, color=ft.Colors.RED_400, size=16),
@@ -256,7 +256,7 @@ class ChatPanel(ft.Container):
         self.chat_area.controls.append(
             ft.Container(
                 expand=True,
-                alignment=ft.alignment.center,
+                alignment=ft.Alignment.CENTER,
                 content=ft.Column(
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                     spacing=8,
@@ -278,14 +278,14 @@ class ChatPanel(ft.Container):
                     ft.Container(
                         width=28, height=28, border_radius=14,
                         bgcolor=ft.Colors.GREEN_700,
-                        alignment=ft.alignment.center,
+                        alignment=ft.Alignment.CENTER,
                         content=ft.Icon(ft.Icons.SMART_TOY, size=16, color=ft.Colors.WHITE),
                     ),
                     ft.Text("Assistant", size=11, color=ft.Colors.GREEN_300, italic=True),
                 ],
             ),
             ft.Container(
-                margin=ft.margin.only(left=36),
+                margin=ft.Margin(left=36, right=0, top=0, bottom=0),
                 content=ft.Text(
                     "Hello! I'm your AI assistant. I can answer questions based on your documents. What would you like to know?",
                     color=ft.Colors.WHITE, size=14,
@@ -310,7 +310,7 @@ class ChatPanel(ft.Container):
                 )
             controls.append(
                 ft.Container(
-                    margin=ft.margin.only(left=36),
+                    margin=ft.Margin(left=36, right=0, top=0, bottom=0),
                     content=ft.Column(
                         spacing=6,
                         controls=[
@@ -325,7 +325,7 @@ class ChatPanel(ft.Container):
             padding=12,
             border_radius=10,
             bgcolor=ft.Colors.with_opacity(0.06, ft.Colors.GREEN),
-            margin=ft.margin.only(right=80),
+            margin=ft.Margin(left=0, right=80, top=0, bottom=0),
             content=ft.Column(spacing=6, controls=controls),
         )
         self.chat_area.controls.append(bubble)

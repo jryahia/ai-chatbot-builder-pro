@@ -54,7 +54,7 @@ class OpenAIEmbeddingProvider(EmbeddingProvider):
 
     async def embed(self, texts: list[str]) -> list[list[float]]:
         from openai import AsyncOpenAI
-        client = AsyncOpenAI(api_key=self.api_key)
+        client = AsyncOpenAI(api_key=self.api_key, base_url=settings.openai_base_url)
         response = await client.embeddings.create(model=self.model_name, input=texts)
         return [item.embedding for item in response.data]
 

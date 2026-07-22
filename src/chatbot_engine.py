@@ -74,7 +74,7 @@ class OpenAIProvider(LLMProvider):
         temperature = kwargs.pop("temperature", 0.7)
         max_tokens = kwargs.pop("max_tokens", 2048)
 
-        client = AsyncOpenAI(api_key=self.api_key)
+        client = AsyncOpenAI(api_key=self.api_key, base_url=settings.openai_base_url)
         stream = await client.chat.completions.create(
             model=self.model,
             messages=messages,

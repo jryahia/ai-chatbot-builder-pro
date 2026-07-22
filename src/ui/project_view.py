@@ -8,14 +8,40 @@ import os
 class ProjectView(ft.Container):
     """View for managing documents and chatting with a specific project."""
 
-    def __init__(self, api_client: Callable, navigate: Callable, project_id: Optional[str] = None):
+    def __init__(self, page: ft.Page, api_base: str = "", project_id: Optional[str] = None):
         super().__init__()
-        self.api_client = api_client
-        self.navigate = navigate
+        self._page = page
+        self.api_base = api_base
         self.project_id = project_id
         self.project = {}
         self.documents = []
         self.loading = ft.ProgressRing(visible=False)
+        self.on_navigate = None
+
+    def api_client(self, path: str, method: str = "GET", **kwargs) -> any:
+        """Synchronous HTTP helper — calls the API via httpx."""
+        import httpx
+        url = f"{self.api_base}{path}"
+        try:
+            if method == "GET":
+                r = httpx.get(url, timeout=10)
+            elif method == "POST":
+                r = httpx.post(url, json=kwargs.get("json"), timeout=10)
+            elif method == "DELETE":
+                r = httpx.delete(url, timeout=10)
+            elif method == "PUT":
+                r = httpx.put(url, json=kwargs.get("json"), timeout=10)
+            else:
+                return None
+            r.raise_for_status()
+            return r.json()
+        except Exception:
+            return None
+
+    def navigate(self, route: str, project_id_val: Optional[str] = None) -> None:
+        """Delegate navigation to the parent app's handler."""
+        if self.on_navigate:
+            self.on_navigate(route, project_id_val)
 
         # Back button and title
         self.title_text = ft.Text("Project", size=22, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE)
@@ -46,16 +72,34 @@ class ProjectView(ft.Container):
         )
 
         # Tabs
+        self._docs_tab = self._build_docs_tab()
+        self._chat_tab = self._build_chat_tab()
         self.tabs = ft.Tabs(
             selected_index=0,
             animation_duration=200,
-            indicator_color=ft.Colors.BLUE_400,
-            label_color=ft.Colors.WHITE,
-            unselected_label_color=ft.Colors.GREY_500,
-            tabs=[
-                ft.Tab(text="Documents", content=self._build_docs_tab()),
-                ft.Tab(text="Chat", content=self._build_chat_tab()),
-            ],
+            length=2,
+            expand=True,
+            content=ft.Column(
+                expand=True,
+                controls=[
+                    ft.TabBar(
+                        label_color=ft.Colors.WHITE,
+                        unselected_label_color=ft.Colors.GREY_500,
+                        indicator_color=ft.Colors.BLUE_400,
+                        tabs=[
+                            ft.Tab(label="Documents"),
+                            ft.Tab(label="Chat"),
+                        ],
+                    ),
+                    ft.TabBarView(
+                        expand=True,
+                        controls=[
+                            self._docs_tab,
+                            self._chat_tab,
+                        ],
+                    ),
+                ],
+            ),
         )
 
         self.content = ft.Container(
