@@ -33,6 +33,8 @@ class Settings(BaseSettings):
     openai_base_url: Optional[str] = None
     anthropic_api_key: Optional[str] = None
     google_api_key: Optional[str] = None
+    deepseek_api_key: Optional[str] = None
+    deepseek_base_url: str = "https://api.deepseek.com"
     ollama_base_url: str = "http://localhost:11434"
     ollama_default_model: str = "llama3.2"
     default_llm_provider: str = "anthropic"
@@ -123,3 +125,35 @@ def get_settings() -> Settings:
 
 
 settings = get_settings()
+
+
+def save_api_key(provider: str, api_key: str) -> None:
+    """Save an API key to the .env file for the given provider."""
+    env_path = Path(".env")
+    key_map = {
+        "openai": "OPENAI_API_KEY",
+        "anthropic": "ANTHROPIC_API_KEY",
+        "google": "GOOGLE_API_KEY",
+        "deepseek": "DEEPSEEK_API_KEY",
+    }
+    env_var = key_map.get(provider)
+    if not env_var:
+        raise ValueError(f"Unknown provider: {provider}")
+
+    # Read existing .env or start fresh
+    lines = []
+    if env_path.exists():
+        lines = env_path.read_text().splitlines()
+
+    # Update or append the key
+    found = False
+    for i, line in enumerate(lines):
+        if line.startswith(f"{env_var}="):
+            lines[i] = f'{env_var}="{api_key}"'
+            found = True
+            break
+    if not found:
+        lines.append(f'{env_var}="{api_key}"')
+
+    env_path.write_text("\n".join(lines) + "\n")
+

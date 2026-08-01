@@ -1,4 +1,6 @@
-"""Settings view for AI Chatbot Builder Pro."""
+"""Settings view — refined classic design for AI Chatbot Builder Pro.
+Cleaner cards, better hierarchy, consistent spacing.
+"""
 
 from __future__ import annotations
 
@@ -10,29 +12,22 @@ import flet as ft
 import structlog
 
 from src.ui.components import (
-    card_surface,
-    info_row,
-    primary_button,
-    secondary_button,
-    danger_button,
-    toast,
+    ACCENT, BG, CARD, SURFACE, TEXT, TEXT2, TEXT3,
+    BORDER_COLOR, SUCCESS, ERROR, WARNING, GLASS_BG,
+    glass_card, card, primary_button, secondary_button,
+    danger_button, ghost_button, toast, divider,
+    T,
 )
-
 logger = structlog.get_logger(__name__)
 
-DARK_BG = "#0f1117"
-DARK_SURFACE = "#1a1d27"
-DARK_CARD = "#222733"
-ACCENT_BLUE = "#4f8cff"
-ACCENT_PURPLE = "#7c5cfc"
-ACCENT_GREEN = "#34d399"
-ACCENT_RED = "#ef4444"
-TEXT_PRIMARY = "#f1f5f9"
-TEXT_SECONDARY = "#94a3b8"
+ACCENT_BLUE = ACCENT
+ACCENT_RED = ERROR
+TEXT_PRIMARY = TEXT
+TEXT_SECONDARY = TEXT2
 
 
 class SettingsView(ft.Column):
-    """Settings page with tabs for API keys, models, appearance, data, and system."""
+    """Settings page — classic card-based layout, 5 tabs, clean sections."""
 
     def __init__(self, page: ft.Page, api_base: str = "") -> None:
         super().__init__()
@@ -42,37 +37,20 @@ class SettingsView(ft.Column):
         self.scroll = ft.ScrollMode.AUTO
         self.expand = True
 
-        # API Keys state
-        self._openai_key = ft.TextField(
-            label="OpenAI API Key",
-            password=True,
-            can_reveal_password=True,
-            width=500,
-            bgcolor=DARK_SURFACE,
-            color=TEXT_PRIMARY,
-            border_color="rgba(255,255,255,0.12)",
-            label_style=ft.TextStyle(color=TEXT_SECONDARY, size=13),
+        shared_input = dict(
+            password=True, can_reveal_password=True,
+            width=450, bgcolor=ft.Colors.with_opacity(0.03, ft.Colors.WHITE),
+            color=TEXT_PRIMARY, border_color="rgba(255,255,255,0.1)",
+            focused_border_color=ACCENT_BLUE, cursor_color=ACCENT_BLUE,
+            label_style=ft.TextStyle(color=TEXT_SECONDARY, size=11),
+            text_style=ft.TextStyle(color=TEXT_PRIMARY, size=14),
+            border_radius=10,
         )
-        self._anthropic_key = ft.TextField(
-            label="Anthropic API Key",
-            password=True,
-            can_reveal_password=True,
-            width=500,
-            bgcolor=DARK_SURFACE,
-            color=TEXT_PRIMARY,
-            border_color="rgba(255,255,255,0.12)",
-            label_style=ft.TextStyle(color=TEXT_SECONDARY, size=13),
-        )
-        self._google_key = ft.TextField(
-            label="Google Gemini API Key",
-            password=True,
-            can_reveal_password=True,
-            width=500,
-            bgcolor=DARK_SURFACE,
-            color=TEXT_PRIMARY,
-            border_color="rgba(255,255,255,0.12)",
-            label_style=ft.TextStyle(color=TEXT_SECONDARY, size=13),
-        )
+
+        self._openai_key = ft.TextField(label="OpenAI API Key", **shared_input)
+        self._anthropic_key = ft.TextField(label="Anthropic API Key", **shared_input)
+        self._google_key = ft.TextField(label="Google Gemini API Key", **shared_input)
+        self._deepseek_key = ft.TextField(label="DeepSeek API Key", **shared_input)
 
         # Model settings
         self._default_model = ft.Dropdown(
@@ -81,20 +59,25 @@ class SettingsView(ft.Column):
                 ft.dropdown.Option("gpt-4o"),
                 ft.dropdown.Option("claude-sonnet-4-20250514"),
                 ft.dropdown.Option("gemini-2.0-flash"),
+                ft.dropdown.Option("deepseek-chat"),
+                ft.dropdown.Option("deepseek-reasoner"),
                 ft.dropdown.Option("ollama/llama3"),
             ],
             value="gpt-4o",
             width=300,
-            bgcolor=DARK_SURFACE,
+            bgcolor=ft.Colors.with_opacity(0.03, ft.Colors.WHITE),
             color=TEXT_PRIMARY,
-            border_color="rgba(255,255,255,0.12)",
-            label_style=ft.TextStyle(color=TEXT_SECONDARY, size=13),
+            border_color="rgba(255,255,255,0.1)",
+            focused_border_color=ACCENT_BLUE,
+            label_style=ft.TextStyle(color=TEXT_SECONDARY, size=11),
+            text_style=ft.TextStyle(color=TEXT_PRIMARY, size=14),
+            border_radius=10,
         )
         self._temperature = ft.Slider(
             min=0.0, max=2.0, value=0.7, divisions=20,
             label="{value}",
             active_color=ACCENT_BLUE,
-            inactive_color="rgba(79,140,255,0.2)",
+            inactive_color=ft.Colors.with_opacity(0.12, ACCENT_BLUE),
         )
 
         # Appearance
@@ -108,7 +91,7 @@ class SettingsView(ft.Column):
             min=12, max=24, value=14, divisions=12,
             label="{value}px",
             active_color=ACCENT_BLUE,
-            inactive_color="rgba(79,140,255,0.2)",
+            inactive_color=ft.Colors.with_opacity(0.12, ACCENT_BLUE),
         )
         self._layout_density = ft.Dropdown(
             label="Layout Density",
@@ -119,10 +102,13 @@ class SettingsView(ft.Column):
             ],
             value="comfortable",
             width=300,
-            bgcolor=DARK_SURFACE,
+            bgcolor=ft.Colors.with_opacity(0.03, ft.Colors.WHITE),
             color=TEXT_PRIMARY,
-            border_color="rgba(255,255,255,0.12)",
-            label_style=ft.TextStyle(color=TEXT_SECONDARY, size=13),
+            border_color="rgba(255,255,255,0.1)",
+            focused_border_color=ACCENT_BLUE,
+            label_style=ft.TextStyle(color=TEXT_SECONDARY, size=11),
+            text_style=ft.TextStyle(color=TEXT_PRIMARY, size=14),
+            border_radius=10,
         )
 
         # System
@@ -136,10 +122,14 @@ class SettingsView(ft.Column):
             value="8000",
             width=150,
             keyboard_type=ft.KeyboardType.NUMBER,
-            bgcolor=DARK_SURFACE,
+            bgcolor=ft.Colors.with_opacity(0.03, ft.Colors.WHITE),
             color=TEXT_PRIMARY,
-            border_color="rgba(255,255,255,0.12)",
-            label_style=ft.TextStyle(color=TEXT_SECONDARY, size=13),
+            border_color="rgba(255,255,255,0.1)",
+            focused_border_color=ACCENT_BLUE,
+            cursor_color=ACCENT_BLUE,
+            label_style=ft.TextStyle(color=TEXT_SECONDARY, size=11),
+            text_style=ft.TextStyle(color=TEXT_PRIMARY, size=14),
+            border_radius=10,
         )
         self._log_level = ft.Dropdown(
             label="Log Level",
@@ -151,13 +141,16 @@ class SettingsView(ft.Column):
             ],
             value="INFO",
             width=200,
-            bgcolor=DARK_SURFACE,
+            bgcolor=ft.Colors.with_opacity(0.03, ft.Colors.WHITE),
             color=TEXT_PRIMARY,
-            border_color="rgba(255,255,255,0.12)",
-            label_style=ft.TextStyle(color=TEXT_SECONDARY, size=13),
+            border_color="rgba(255,255,255,0.1)",
+            focused_border_color=ACCENT_BLUE,
+            label_style=ft.TextStyle(color=TEXT_SECONDARY, size=11),
+            text_style=ft.TextStyle(color=TEXT_PRIMARY, size=14),
+            border_radius=10,
         )
 
-        # Build tabs — Flet 0.86 TabBar + TabBarView
+        # Build tabs
         self._api_keys_tab = self._build_api_keys_tab()
         self._model_tab = self._build_model_tab()
         self._appearance_tab = self._build_appearance_tab()
@@ -176,11 +169,12 @@ class SettingsView(ft.Column):
                         label_color=ACCENT_BLUE,
                         unselected_label_color=TEXT_SECONDARY,
                         indicator_color=ACCENT_BLUE,
+                        indicator_size=3,
                         tabs=[
                             ft.Tab(label="API Keys"),
-                            ft.Tab(label="Model Settings"),
+                            ft.Tab(label="Model"),
                             ft.Tab(label="Appearance"),
-                            ft.Tab(label="Data Management"),
+                            ft.Tab(label="Data"),
                             ft.Tab(label="System"),
                         ],
                     ),
@@ -199,38 +193,51 @@ class SettingsView(ft.Column):
         )
 
         self.controls = [
-            ft.Text("Settings", size=28, weight=ft.FontWeight.BOLD, color=TEXT_PRIMARY),
-            ft.Text("Configure your AI Chatbot Builder", size=14, color=TEXT_SECONDARY),
-            ft.Divider(height=1, color="rgba(255,255,255,0.08)"),
+            ft.Container(
+                content=ft.Column(
+                    controls=[
+                        ft.Text("Settings", size=26, weight=ft.FontWeight.BOLD, color=TEXT_PRIMARY),
+                        ft.Text("Configure your AI Chatbot Builder", size=14, color=TEXT_SECONDARY),
+                    ],
+                    spacing=2,
+                ),
+                margin=ft.Margin.only(bottom=4),
+            ),
+            divider(),
             self.tabs,
         ]
 
+    def render(self, project_id: str | None = None) -> "SettingsView":
+        return self
+
     def _section_card(self, title: str, controls: list[ft.Control]) -> ft.Container:
-        """Wrap controls in a section card."""
+        """Wrap controls in a refined section card."""
         return ft.Container(
             content=ft.Column(
                 [
-                    ft.Text(title, size=18, weight=ft.FontWeight.W_600, color=TEXT_PRIMARY),
+                    ft.Text(title, size=16, weight=ft.FontWeight.W_600, color=TEXT_PRIMARY),
                     ft.Divider(height=1, color="rgba(255,255,255,0.06)"),
                     *controls,
                 ],
-                spacing=16,
+                spacing=14,
             ),
-            bgcolor=DARK_CARD,
+            bgcolor=CARD,
             border_radius=12,
-            padding=24,
+            padding=ft.Padding.symmetric(horizontal=24, vertical=20),
+            border=ft.Border.all(1, "rgba(255,255,255,0.06)"),
         )
 
     def _build_api_keys_tab(self) -> ft.Container:
-        """Build API keys settings tab."""
         return ft.Container(
             content=ft.Column(
                 [
                     self._section_card("API Keys", [
-                        ft.Text("Store your provider API keys here. Keys are encrypted at rest.", size=13, color=TEXT_SECONDARY),
+                        ft.Text("Store your provider API keys here. Keys are encrypted at rest.",
+                                size=13, color=TEXT_SECONDARY),
                         self._openai_key,
                         self._anthropic_key,
                         self._google_key,
+                        self._deepseek_key,
                         ft.Row(
                             [primary_button("Save Keys", on_click=self._save_api_keys)],
                             alignment=ft.MainAxisAlignment.END,
@@ -240,11 +247,10 @@ class SettingsView(ft.Column):
                 spacing=20,
                 scroll=ft.ScrollMode.AUTO,
             ),
-            padding=10,
+            padding=ft.Padding.symmetric(horizontal=4, vertical=8),
         )
 
     def _build_model_tab(self) -> ft.Container:
-        """Build model settings tab."""
         return ft.Container(
             content=ft.Column(
                 [
@@ -253,7 +259,8 @@ class SettingsView(ft.Column):
                         self._default_model,
                     ]),
                     self._section_card("Generation Settings", [
-                        ft.Text("Temperature controls response randomness. Lower = more deterministic.", size=13, color=TEXT_SECONDARY),
+                        ft.Text("Temperature controls response randomness — lower is more deterministic.",
+                                size=13, color=TEXT_SECONDARY),
                         ft.Row(
                             [ft.Text("Temperature", size=14, color=TEXT_PRIMARY), self._temperature],
                             vertical_alignment=ft.CrossAxisAlignment.CENTER,
@@ -267,17 +274,14 @@ class SettingsView(ft.Column):
                 spacing=20,
                 scroll=ft.ScrollMode.AUTO,
             ),
-            padding=10,
+            padding=ft.Padding.symmetric(horizontal=4, vertical=8),
         )
 
     def _build_appearance_tab(self) -> ft.Container:
-        """Build appearance settings tab."""
         return ft.Container(
             content=ft.Column(
                 [
-                    self._section_card("Theme", [
-                        self._theme_toggle,
-                    ]),
+                    self._section_card("Theme", [self._theme_toggle]),
                     self._section_card("Font Size", [
                         ft.Text("Adjust the UI font size.", size=13, color=TEXT_SECONDARY),
                         ft.Row(
@@ -285,9 +289,7 @@ class SettingsView(ft.Column):
                             vertical_alignment=ft.CrossAxisAlignment.CENTER,
                         ),
                     ]),
-                    self._section_card("Layout", [
-                        self._layout_density,
-                    ]),
+                    self._section_card("Layout", [self._layout_density]),
                     ft.Row(
                         [primary_button("Save Appearance", on_click=self._save_appearance)],
                         alignment=ft.MainAxisAlignment.END,
@@ -296,11 +298,10 @@ class SettingsView(ft.Column):
                 spacing=20,
                 scroll=ft.ScrollMode.AUTO,
             ),
-            padding=10,
+            padding=ft.Padding.symmetric(horizontal=4, vertical=8),
         )
 
     def _build_data_tab(self) -> ft.Container:
-        """Build data management tab."""
         return ft.Container(
             content=ft.Column(
                 [
@@ -319,7 +320,8 @@ class SettingsView(ft.Column):
                         ),
                     ]),
                     self._section_card("Clear Data", [
-                        ft.Text("Permanently delete all projects, documents, and settings. This cannot be undone.", size=13, color=ACCENT_RED),
+                        ft.Text("Permanently delete all projects, documents, and settings. This cannot be undone.",
+                                size=13, color=ACCENT_RED),
                         ft.Row(
                             [danger_button("Clear All Data", on_click=self._confirm_clear_data)],
                             alignment=ft.MainAxisAlignment.START,
@@ -329,11 +331,10 @@ class SettingsView(ft.Column):
                 spacing=20,
                 scroll=ft.ScrollMode.AUTO,
             ),
-            padding=10,
+            padding=ft.Padding.symmetric(horizontal=4, vertical=8),
         )
 
     def _build_system_tab(self) -> ft.Container:
-        """Build system settings tab."""
         return ft.Container(
             content=ft.Column(
                 [
@@ -344,9 +345,7 @@ class SettingsView(ft.Column):
                             vertical_alignment=ft.CrossAxisAlignment.CENTER,
                         ),
                     ]),
-                    self._section_card("Logging", [
-                        self._log_level,
-                    ]),
+                    self._section_card("Logging", [self._log_level]),
                     ft.Row(
                         [primary_button("Save System Settings", on_click=self._save_system_settings)],
                         alignment=ft.MainAxisAlignment.END,
@@ -355,16 +354,17 @@ class SettingsView(ft.Column):
                 spacing=20,
                 scroll=ft.ScrollMode.AUTO,
             ),
-            padding=10,
+            padding=ft.Padding.symmetric(horizontal=4, vertical=8),
         )
 
+    # ─── Save Handlers ─────────────────────────────────────────────────────────
     def _save_api_keys(self, e: ft.ControlEvent | None = None) -> None:
-        """Save API keys to encrypted config."""
         try:
             from src.config import save_api_key
             save_api_key("openai", self._openai_key.value or "")
             save_api_key("anthropic", self._anthropic_key.value or "")
             save_api_key("google", self._google_key.value or "")
+            save_api_key("deepseek", self._deepseek_key.value or "")
             self._page.snack_bar = toast("API keys saved securely!")
             self._page.snack_bar.open = True
             self.update()
@@ -375,7 +375,6 @@ class SettingsView(ft.Column):
             self.update()
 
     def _save_model_settings(self, e: ft.ControlEvent | None = None) -> None:
-        """Save model settings."""
         try:
             from src.config import settings
             settings.default_model = self._default_model.value
@@ -390,7 +389,6 @@ class SettingsView(ft.Column):
             self.update()
 
     def _save_appearance(self, e: ft.ControlEvent | None = None) -> None:
-        """Save appearance settings."""
         try:
             from src.config import settings
             settings.dark_mode = self._theme_toggle.value
@@ -406,7 +404,6 @@ class SettingsView(ft.Column):
             self.update()
 
     def _save_system_settings(self, e: ft.ControlEvent | None = None) -> None:
-        """Save system settings."""
         try:
             from src.config import settings
             settings.auto_start = self._auto_start.value
@@ -422,13 +419,11 @@ class SettingsView(ft.Column):
             self.update()
 
     def _toggle_theme(self, e: ft.ControlEvent | None = None) -> None:
-        """Toggle between dark and light theme."""
         is_dark = self._theme_toggle.value
         self._page.theme_mode = ft.ThemeMode.DARK if is_dark else ft.ThemeMode.LIGHT
         self._page.update()
 
     def _export_projects(self, e: ft.ControlEvent | None = None) -> None:
-        """Export all projects as JSON."""
         try:
             from src.export import export_all_projects
             data = export_all_projects()
@@ -445,7 +440,6 @@ class SettingsView(ft.Column):
             self.update()
 
     def _import_projects(self, e: ft.ControlEvent | None = None) -> None:
-        """Import projects from JSON file."""
         def on_file_result(result: ft.FilePickerResultEvent | None) -> None:
             if result and result.files:
                 try:
@@ -467,7 +461,6 @@ class SettingsView(ft.Column):
         file_picker.pick_files(allow_multiple=False, file_type=ft.FilePickerFileType.CUSTOM, allowed_extensions=["json"])
 
     def _confirm_clear_data(self, e: ft.ControlEvent | None = None) -> None:
-        """Show confirmation dialog before clearing all data."""
         def on_confirm(e: ft.ControlEvent | None = None) -> None:
             dlg.open = False
             self._page.update()
@@ -485,16 +478,27 @@ class SettingsView(ft.Column):
 
         dlg = ft.AlertDialog(
             modal=True,
-            title=ft.Text("Clear All Data", color=TEXT_PRIMARY),
+            title=ft.Text("Clear All Data", color=TEXT_PRIMARY, size=18),
             content=ft.Text(
-                "Are you sure you want to delete ALL projects, documents, conversations, and settings? This action cannot be undone.",
-                color=TEXT_SECONDARY,
+                "Are you sure you want to delete ALL projects, documents, conversations, and settings? "
+                "This action cannot be undone.",
+                color=TEXT_SECONDARY, size=14,
             ),
+            bgcolor=SURFACE,
             actions=[
-                ft.TextButton("Cancel", on_click=lambda e: (setattr(dlg, 'open', False), self._page.update())),
-                ft.TextButton("Delete Everything", style=ft.ButtonStyle(color=ACCENT_RED), on_click=on_confirm),
+                ft.TextButton(
+                    "Cancel",
+                    on_click=lambda e: (setattr(dlg, 'open', False), self._page.update()),
+                    style=ft.ButtonStyle(color=TEXT_SECONDARY),
+                ),
+                ft.TextButton(
+                    "Delete Everything",
+                    style=ft.ButtonStyle(color=ACCENT_RED),
+                    on_click=on_confirm,
+                ),
             ],
-            bgcolor=DARK_SURFACE,
+            actions_alignment=ft.MainAxisAlignment.END,
+            shape=ft.RoundedRectangleBorder(radius=14),
         )
         self._page.dialog = dlg
         dlg.open = True

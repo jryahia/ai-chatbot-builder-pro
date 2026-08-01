@@ -4,7 +4,9 @@ import asyncio
 import time
 from typing import AsyncGenerator, Optional
 
+import anthropic
 import structlog
+from openai import AsyncOpenAI
 
 from src.config import settings
 from src.vector_store import build_bm25_index, hybrid_search, rerank
@@ -35,8 +37,6 @@ class AnthropicProvider(LLMProvider):
     async def generate_stream(
         self, messages: list[dict], **kwargs
     ) -> AsyncGenerator[str, None]:
-        import anthropic
-
         system = kwargs.pop("system", None)
         temperature = kwargs.pop("temperature", 0.7)
         max_tokens = kwargs.pop("max_tokens", 2048)
@@ -69,8 +69,6 @@ class OpenAIProvider(LLMProvider):
     async def generate_stream(
         self, messages: list[dict], **kwargs
     ) -> AsyncGenerator[str, None]:
-        from openai import AsyncOpenAI
-
         temperature = kwargs.pop("temperature", 0.7)
         max_tokens = kwargs.pop("max_tokens", 2048)
 
@@ -137,6 +135,33 @@ class GeminiProvider(LLMProvider):
                 yield chunk.text
 
 
+class DeepSeekProvider(LLMProvider):
+    """DeepSeek via OpenAI-compatible API."""
+    def __init__(self, api_key: Optional[str] = None, model: str = "deepseek-chat") -> None:
+        self.api_key = api_key or settings.deepseek_api_key
+        self.model = model
+        self.base_url = settings.deepseek_base_url
+
+    async def generate_stream(
+        self, messages: list[dict], **kwargs
+    ) -> AsyncGenerator[str, None]:
+        temperature = kwargs.pop("temperature", 0.7)
+        max_tokens = kwargs.pop("max_tokens", 4096)
+
+        client = AsyncOpenAI(api_key=self.api_key, base_url=self.base_url)
+        stream = await client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            stream=True,
+        )
+        async for chunk in stream:
+            delta = chunk.choices[0].delta.content
+            if delta:
+                yield delta
+
+
 class OllamaProvider(LLMProvider):
     def __init__(self, base_url: str = "", model: str = "llama3.2") -> None:
         self.base_url = base_url or settings.ollama_base_url
@@ -187,6 +212,8 @@ def get_llm_provider(provider: str, model: str) -> LLMProvider:
             _llm_providers[key] = GeminiProvider(model=model)
         elif provider == "ollama":
             _llm_providers[key] = OllamaProvider(model=model)
+        elif provider == "deepseek":
+            _llm_providers[key] = DeepSeekProvider(model=model)
         else:
             _llm_providers[key] = AnthropicProvider(model="claude-sonnet-4-6")
     return _llm_providers[key]

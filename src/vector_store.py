@@ -4,7 +4,6 @@ import asyncio
 import uuid
 from typing import Any, Optional
 
-import numpy as np
 import structlog
 from rank_bm25 import BM25Okapi
 
@@ -244,6 +243,7 @@ class BM25Index:
     def __init__(self) -> None:
         self._corpus: list[str] = []
         self._metadatas: list[dict] = []
+        self._token_sets: list[set[str]] = []
         self._bm25: Optional[BM25Okapi] = None
 
     def _tokenize(self, text: str) -> list[str]:
@@ -253,23 +253,37 @@ class BM25Index:
         self._corpus = texts
         self._metadatas = metadatas
         tokenized = [self._tokenize(t) for t in texts]
+        self._token_sets = [set(t) for t in tokenized]
         self._bm25 = BM25Okapi(tokenized) if tokenized else None
 
     def search(self, query: str, k: int = 10) -> list[dict]:
         if not self._bm25 or not self._corpus:
             return []
-        scores = self._bm25.get_scores(self._tokenize(query))
-        top_idx = np.argsort(scores)[::-1][:k]
-        results = []
-        for idx in top_idx:
-            if scores[idx] > 0:
-                results.append({
-                    "content": self._corpus[idx],
-                    "metadata": self._metadatas[idx],
-                    "score": float(scores[idx]),
-                    "search_type": "sparse",
-                })
-        return results
+        query_tokens = self._tokenize(query)
+        if not query_tokens:
+            return []
+
+        scores = self._bm25.get_scores(query_tokens)
+
+        # A hit is a document that actually shares a term with the query. We
+        # can't use `score > 0` for that: BM25 scores go to zero or below on
+        # small corpora where a term occurs in every document, which would drop
+        # every result for a project with only one or two documents.
+        wanted = set(query_tokens)
+        matching = [i for i, tokens in enumerate(self._token_sets) if wanted & tokens]
+        if not matching:
+            return []
+
+        matching.sort(key=lambda i: scores[i], reverse=True)
+        return [
+            {
+                "content": self._corpus[idx],
+                "metadata": self._metadatas[idx],
+                "score": float(scores[idx]),
+                "search_type": "sparse",
+            }
+            for idx in matching[:k]
+        ]
 
 
 _bm25_indexes: dict[str, BM25Index] = {}

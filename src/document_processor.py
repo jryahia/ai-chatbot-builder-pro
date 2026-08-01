@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import AsyncGenerator, Optional
 
 import aiofiles
+import httpx
 import structlog
 import tiktoken
 
@@ -151,7 +152,6 @@ async def parse_file(file_path: str, filename: str) -> str:
 async def crawl_url_simple(url: str) -> str:
     """Fetch and extract text from a URL using trafilatura."""
     import trafilatura
-    import httpx
 
     async with httpx.AsyncClient(timeout=30, follow_redirects=True) as client:
         response = await client.get(url, headers={

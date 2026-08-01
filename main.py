@@ -93,8 +93,8 @@ def main() -> None:
     import flet as ft
     from src.ui.app import main as flet_main
 
-    ft.app(
-        target=flet_main,
+    ft.run(
+        flet_main,
         view=ft.AppView.FLET_APP,
         port=settings.flet_port,
     )

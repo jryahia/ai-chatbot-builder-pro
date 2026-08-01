@@ -1,11 +1,13 @@
-"""Flet app shell with routing and navigation."""
+"""Flet app shell with routing and navigation — classic premium dark design.
+Chic, fast, refined. Glass sidebar, subtle header, smooth transitions.
+"""
 
 from typing import Callable, Optional
 
 import flet as ft
 
 from src.config import settings
-from src.ui.components import ACCENT, ACCENT2, BG, CARD, SURFACE, TEXT, TEXT2
+from src.ui.components import ACCENT, ACCENT2, BG, CARD, SURFACE, TEXT, TEXT2, BORDER_COLOR, divider
 
 
 ROUTES = {
@@ -21,10 +23,12 @@ async def main(page: ft.Page) -> None:
     page.theme_mode = ft.ThemeMode.DARK
     page.bgcolor = BG
     page.padding = 0
-    page.window_width = 1280
-    page.window_height = 800
-    page.window_min_width = 900
-    page.window_min_height = 600
+
+    # Window — classic desktop proportions
+    page.window.width = 1280
+    page.window.height = 800
+    page.window.min_width = 960
+    page.window.min_height = 640
 
     page.theme = ft.Theme(
         color_scheme_seed=ACCENT,
@@ -41,14 +45,13 @@ async def main(page: ft.Page) -> None:
             label_large=ft.TextStyle(color=TEXT),
         ),
     )
-    page.bgcolor = BG
 
-    # State
+    # ─── State ─────────────────────────────────────────────────────────────────
     current_route = "dashboard"
     selected_project_id: Optional[str] = None
     selected_nav_index = 0
 
-    # Import views
+    # ─── View Imports ──────────────────────────────────────────────────────────
     from src.ui.dashboard import DashboardView
     from src.ui.project_view import ProjectView
     from src.ui.analytics_view import AnalyticsView
@@ -61,136 +64,144 @@ async def main(page: ft.Page) -> None:
     analytics_view = AnalyticsView(page, api_base)
     settings_view = SettingsView(page, api_base)
 
+    # ─── Content Area ──────────────────────────────────────────────────────────
     content_area = ft.Container(
-        content=await dashboard.build(),
+        content=dashboard.render(),
         expand=True,
         bgcolor=BG,
+        padding=0,
     )
 
-    async def navigate(route: str, project_id: Optional[str] = None) -> None:
+    # ─── Navigate ──────────────────────────────────────────────────────────────
+    def navigate(route: str, project_id: Optional[str] = None) -> None:
         nonlocal current_route, selected_project_id, selected_nav_index
 
         current_route = route
         selected_project_id = project_id
 
-        if route == "dashboard":
-            content_area.content = await dashboard.build()
+        if route == "project" and project_id:
+            content_area.content = project_view.render(project_id)
             selected_nav_index = 0
-        elif route == "project" and project_id:
-            content_area.content = await project_view.build(project_id)
-            selected_nav_index = 0
-        elif route == "analytics" and project_id:
-            content_area.content = await analytics_view.build(project_id)
+        elif route == "analytics":
+            content_area.content = analytics_view.render(project_id)
             selected_nav_index = 1
         elif route == "settings":
-            content_area.content = await settings_view.build()
+            content_area.content = settings_view.render()
             selected_nav_index = 3
         else:
-            content_area.content = await dashboard.build()
+            route = "dashboard"
+            content_area.content = dashboard.render()
             selected_nav_index = 0
 
         nav_rail.selected_index = selected_nav_index
         page.update()
+
+        # Trigger data load after mount
+        if route == "dashboard":
+            dashboard.load_projects()
+        elif route == "project" and project_id:
+            project_view._load_project()
+        elif route == "analytics":
+            analytics_view._load_data()
 
     dashboard.on_navigate = navigate
     project_view.on_navigate = navigate
     analytics_view.on_navigate = navigate
     settings_view.on_navigate = navigate
 
-    async def on_nav_change(e: ft.ControlEvent) -> None:
+    def on_nav_change(e: ft.ControlEvent) -> None:
         idx = e.control.selected_index
         if idx == 0:
-            await navigate("dashboard")
+            navigate("dashboard")
         elif idx == 1:
-            if selected_project_id:
-                await navigate("analytics", selected_project_id)
-            else:
-                await navigate("dashboard")
+            navigate("analytics", selected_project_id)
         elif idx == 2:
-            # Refresh current view
-            await navigate(current_route, selected_project_id)
+            navigate(current_route, selected_project_id)
         elif idx == 3:
-            await navigate("settings")
+            navigate("settings")
+
+    # ─── Navigation Rail — refined, compact ────────────────────────────────────
+    nav_destinations = [
+        ft.NavigationRailDestination(
+            icon=ft.Icons.DASHBOARD_ROUNDED,
+            selected_icon=ft.Icons.DASHBOARD,
+            label="Dashboard",
+        ),
+        ft.NavigationRailDestination(
+            icon=ft.Icons.ANALYTICS_ROUNDED,
+            selected_icon=ft.Icons.BAR_CHART,
+            label="Analytics",
+        ),
+        ft.NavigationRailDestination(
+            icon=ft.Icons.REFRESH_ROUNDED,
+            selected_icon=ft.Icons.REFRESH,
+            label="Refresh",
+        ),
+        ft.NavigationRailDestination(
+            icon=ft.Icons.SETTINGS_ROUNDED,
+            selected_icon=ft.Icons.SETTINGS,
+            label="Settings",
+        ),
+    ]
 
     nav_rail = ft.NavigationRail(
         selected_index=0,
         label_type=ft.NavigationRailLabelType.ALL,
-        min_width=80,
+        min_width=72,
         min_extended_width=160,
         bgcolor=SURFACE,
-        indicator_color=ft.Colors.with_opacity(0.15, ACCENT),
+        indicator_color=ft.Colors.with_opacity(0.12, ACCENT),
         indicator_shape=ft.RoundedRectangleBorder(radius=8),
-        destinations=[
-            ft.NavigationRailDestination(
-                icon=ft.Icons.DASHBOARD_OUTLINED,
-                selected_icon=ft.Icons.DASHBOARD,
-                label="Dashboard",
-            ),
-            ft.NavigationRailDestination(
-                icon=ft.Icons.BAR_CHART_OUTLINED,
-                selected_icon=ft.Icons.BAR_CHART,
-                label="Analytics",
-            ),
-            ft.NavigationRailDestination(
-                icon=ft.Icons.REFRESH_OUTLINED,
-                selected_icon=ft.Icons.REFRESH,
-                label="Refresh",
-            ),
-            ft.NavigationRailDestination(
-                icon=ft.Icons.SETTINGS_OUTLINED,
-                selected_icon=ft.Icons.SETTINGS,
-                label="Settings",
-            ),
-        ],
+        destinations=nav_destinations,
         on_change=on_nav_change,
     )
 
-    # App header
+    # ─── App Header — sleek, minimal ──────────────────────────────────────────
     header = ft.Container(
         content=ft.Row(
             [
                 ft.Row(
                     [
+                        # Logo badge — subtle glow
                         ft.Container(
                             content=ft.Text("CB", size=14, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
                             bgcolor=ACCENT,
                             border_radius=8,
-                            width=32,
-                            height=32,
+                            width=30,
+                            height=30,
                             alignment=ft.Alignment.CENTER,
+                            shadow=ft.BoxShadow(
+                                blur_radius=14,
+                                color=ft.Colors.with_opacity(0.35, ACCENT),
+                                offset=ft.Offset(0, 2),
+                            ),
                         ),
-                        ft.Text("AI Chatbot Builder", size=16, weight=ft.FontWeight.BOLD, color=TEXT),
+                        ft.Text("AI Chatbot Builder", size=15, weight=ft.FontWeight.W_600, color=TEXT),
                         ft.Container(
-                            content=ft.Text("PRO", size=10, weight=ft.FontWeight.BOLD, color=ACCENT),
-                            bgcolor=ft.Colors.with_opacity(0.15, ACCENT),
+                            content=ft.Text("PRO", size=9, weight=ft.FontWeight.BOLD, color=ACCENT),
+                            bgcolor=ft.Colors.with_opacity(0.12, ACCENT),
                             border_radius=4,
-                            padding=ft.Padding.symmetric(horizontal=6, vertical=2),
+                            padding=ft.Padding.symmetric(horizontal=5, vertical=2),
                         ),
                     ],
-                    spacing=10,
-                ),
-                ft.Row(
-                    [
-                        ft.Text("●", size=10, color="#34d399"),
-                        ft.Text(f"API :{settings.api_port}", size=12, color=TEXT2),
-                    ],
-                    spacing=4,
+                    spacing=8,
                 ),
             ],
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
         ),
         bgcolor=SURFACE,
-        padding=ft.Padding.symmetric(horizontal=20, vertical=12),
-        border=ft.Border.only(bottom=ft.BorderSide(1, ft.Colors.with_opacity(0.08, ft.Colors.WHITE))),
+        padding=ft.Padding.symmetric(horizontal=24, vertical=10),
+        border=ft.Border.only(bottom=ft.BorderSide(1, ft.Colors.with_opacity(0.06, ft.Colors.WHITE))),
     )
 
+    # ─── Layout ────────────────────────────────────────────────────────────────
     layout = ft.Column(
         [
             header,
             ft.Row(
                 [
                     nav_rail,
-                    ft.VerticalDivider(width=1, color=ft.Colors.with_opacity(0.08, ft.Colors.WHITE)),
+                    ft.VerticalDivider(width=1, color=ft.Colors.with_opacity(0.06, ft.Colors.WHITE)),
                     content_area,
                 ],
                 expand=True,
@@ -203,3 +214,6 @@ async def main(page: ft.Page) -> None:
 
     page.add(layout)
     page.update()
+
+    # Initial data load
+    dashboard.load_projects()

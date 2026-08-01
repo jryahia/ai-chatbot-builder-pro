@@ -27,6 +27,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response, StreamingResponse
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from src.analytics import export_analytics_csv, get_project_analytics, record_usage
 from src.auth import generate_api_key, get_api_key_project, hash_api_key
@@ -94,7 +95,13 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins_list,
-    allow_credentials=True,
+    # The embeddable chat widget authenticates via the X-API-Key *header* (no
+    # cookies), so cross-origin requests never need credentials. Combining
+    # allow_origins=["*"] with allow_credentials=True is invalid/insecure in
+    # browsers, so disallow credentials whenever the wildcard is in use. If an
+    # explicit origin allowlist is configured, credentials are enabled (e.g. for
+    # cookie-based admin sessions).
+    allow_credentials=(settings.cors_origins != "*"),
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -200,7 +207,7 @@ async def delete_project(project_id: str, db: AsyncSession = Depends(get_db)) ->
     return MessageOut(message="Project deleted")
 
 
-@app.post("/api/v1/projects/{project_id}/duplicate", response_model=ProjectResponse, tags=["Projects"])
+@app.post("/api/v1/projects/{project_id}/duplicate", response_model=ProjectResponse, status_code=201, tags=["Projects"])
 async def duplicate_project(project_id: str, db: AsyncSession = Depends(get_db)) -> ProjectResponse:
     original = await _require_project(db, project_id)
     new_project = Project(
@@ -259,7 +266,7 @@ async def upload_document(
     doc = Document(
         id=str(uuid.uuid4()),
         project_id=project_id,
-        filename=dest_path.name,
+        filename=safe_name,
         original_filename=safe_name,
         file_type=get_file_type(safe_name),
         file_path=str(dest_path),
@@ -599,6 +606,9 @@ async def list_conversations(
     result = await db.execute(
         select(Conversation)
         .where(Conversation.project_id == project_id)
+        # `messages` is part of ConversationResponse, so it has to be loaded up
+        # front — a lazy load during serialization has no greenlet to run in.
+        .options(selectinload(Conversation.messages))
         .order_by(Conversation.updated_at.desc())
         .offset((page - 1) * page_size)
         .limit(page_size)
@@ -728,6 +738,9 @@ async def revoke_api_key(
 
 # ─── Embed Widget ─────────────────────────────────────────────────────────────
 
+WIDGET_KEY_NAME = "Embed widget"
+
+
 @app.post("/api/v1/projects/{project_id}/embed-widget", response_model=EmbedCodeResponse, tags=["Widget"])
 async def generate_embed_code(
     project_id: str,
@@ -735,14 +748,40 @@ async def generate_embed_code(
     db: AsyncSession = Depends(get_db),
 ) -> EmbedCodeResponse:
     await _require_project(db, project_id)
-    result = await db.execute(
-        select(ApiKey).where(ApiKey.project_id == project_id, ApiKey.is_active == True).limit(1)
-    )
-    key = result.scalar_one_or_none()
-    if not key:
-        raise HTTPException(status_code=400, detail="No active API key found. Create one first.")
 
-    raw_key = key.key_prefix
+    # Only the hash of a key is stored, so an existing secret can't be read back
+    # to put in the snippet. The widget key is therefore owned by this endpoint:
+    # it is issued on first use and rotated on every regeneration, which
+    # invalidates the previous snippet. Keys the user created by hand are left
+    # alone.
+    result = await db.execute(
+        select(ApiKey)
+        .where(
+            ApiKey.project_id == project_id,
+            ApiKey.name == WIDGET_KEY_NAME,
+            ApiKey.is_active == True,
+        )
+        .limit(1)
+    )
+    widget_key = result.scalar_one_or_none()
+
+    raw_key, key_prefix, key_hash = generate_api_key()
+    if widget_key:
+        widget_key.key_prefix = key_prefix
+        widget_key.key_hash = key_hash
+        db.add(widget_key)
+    else:
+        db.add(
+            ApiKey(
+                id=str(uuid.uuid4()),
+                project_id=project_id,
+                name=WIDGET_KEY_NAME,
+                key_prefix=key_prefix,
+                key_hash=key_hash,
+            )
+        )
+    await db.flush()
+
     config_dict = widget_config.model_dump()
 
     return EmbedCodeResponse(
@@ -824,7 +863,7 @@ async def export_project_endpoint(project_id: str, db: AsyncSession = Depends(ge
     )
 
 
-@app.post("/api/v1/projects/import", response_model=ProjectResponse, tags=["Projects"])
+@app.post("/api/v1/projects/import", response_model=ProjectResponse, status_code=201, tags=["Projects"])
 async def import_project_endpoint(request: Request, db: AsyncSession = Depends(get_db)) -> ProjectResponse:
     body = await request.json()
     new_id = await import_project(db, body)

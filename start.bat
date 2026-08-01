@@ -1,0 +1,9 @@
+@echo off
+cd /d "%~dp0"
+echo Killing any leftover process on port 8000...
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":8000" ^| findstr "LISTENING"') do taskkill /F /PID %%a 2>nul
+echo Activating virtual environment...
+call .venv\Scripts\activate.bat
+echo Starting AI Chatbot Builder Pro...
+python main.py
+pause

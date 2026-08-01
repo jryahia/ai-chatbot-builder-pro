@@ -17,6 +17,7 @@ from src.ui.components import (
     SURFACE,
     TEXT,
     TEXT2,
+    WARNING,
     card,
     code_block,
     danger_button,
