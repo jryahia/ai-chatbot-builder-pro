@@ -1,5 +1,23 @@
 # AI Chatbot Builder Pro
 
+**Build, train and embed RAG chatbots with hybrid retrieval, re-ranking and multi-provider LLMs, from a desktop app or an API.**
+
+![Python](https://img.shields.io/badge/Python-161b22?style=for-the-badge&labelColor=161b22&color=161b22) ![FastAPI](https://img.shields.io/badge/FastAPI-161b22?style=for-the-badge&labelColor=161b22&color=161b22) ![Flet](https://img.shields.io/badge/Flet-161b22?style=for-the-badge&labelColor=161b22&color=161b22) ![ChromaDB](https://img.shields.io/badge/ChromaDB-161b22?style=for-the-badge&labelColor=161b22&color=161b22) ![Claude](https://img.shields.io/badge/Claude-161b22?style=for-the-badge&labelColor=161b22&color=161b22) ![OpenAI](https://img.shields.io/badge/OpenAI-161b22?style=for-the-badge&labelColor=161b22&color=161b22) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-161b22?style=for-the-badge&labelColor=161b22&color=161b22) ![Docker](https://img.shields.io/badge/Docker-161b22?style=for-the-badge&labelColor=161b22&color=161b22)
+
+```mermaid
+flowchart LR
+    S0["Documents + URLs"]
+    S1["Chunking + embeddings"]
+    S2["Hybrid retrieval (vector + BM25) + re-rank"]
+    S3["LLM answer (Claude / GPT / Gemini / Ollama)"]
+    S4["Embeddable widget + analytics"]
+    S0 --> S1 --> S2 --> S3 --> S4
+```
+
+## Problem it solves
+
+Businesses want chatbots that answer from their own documents, not generic model knowledge. This builder ingests documents and URLs, retrieves with dense plus BM25 search and re-ranking, and ships each bot as an embeddable widget with its own analytics.
+
 A production-grade, full-stack AI chatbot builder with RAG (Retrieval-Augmented Generation), hybrid vector + BM25 search, re-ranking, and an embeddable widget system. Built with FastAPI, Flet (desktop UI), ChromaDB, and support for Anthropic, OpenAI, Gemini, and Ollama.
 
 ---
