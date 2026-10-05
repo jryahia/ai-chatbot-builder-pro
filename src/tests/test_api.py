@@ -61,7 +61,10 @@ async def client(db_engine) -> AsyncGenerator[AsyncClient, None]:
     async def mock_init_db() -> None:
         pass
 
-    with patch("src.api_server.init_db", side_effect=mock_init_db):
+    # Background tasks open their own sessions through db_session(), which
+    # reads AsyncSessionLocal; point it at the test engine as well.
+    with patch("src.api_server.init_db", side_effect=mock_init_db), \
+            patch("src.database.AsyncSessionLocal", AsyncTestingSession):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
             yield ac
 
