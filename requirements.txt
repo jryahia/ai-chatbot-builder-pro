@@ -77,4 +77,4 @@ pytest-mock==3.14.0
 pinecone-client==5.0.1
 
 # Cross-encoder reranking
-transformers==4.47.1
+transformers==4.46.3
