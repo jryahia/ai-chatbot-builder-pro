@@ -585,7 +585,7 @@ class ProjectView(ft.Container):
                 for s in sources[:3]:
                     name = s.get("filename", s.get("name", "Source"))
                     score = s.get("score", 0)
-                    source_texts.append(f"📄 {name} ({score:.2f})")
+                    source_texts.append(f"{name} ({score:.2f})")
                 resp_controls.append(
                     ft.Container(
                         padding=ft.Padding.symmetric(horizontal=10, vertical=8),

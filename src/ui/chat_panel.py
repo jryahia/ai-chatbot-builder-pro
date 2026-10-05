@@ -195,7 +195,7 @@ class ChatPanel(ft.Container):
                         border_radius=4,
                         bgcolor=ft.Colors.with_opacity(0.08, ft.Colors.BLUE),
                         content=ft.Text(
-                            f"📄 {name} ({score:.2f})" if score else f"📄 {name}",
+                            f"{name} ({score:.2f})" if score else f"{name}",
                             size=11, color=ft.Colors.BLUE_300,
                         ),
                     )
