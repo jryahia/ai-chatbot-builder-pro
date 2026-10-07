@@ -402,25 +402,23 @@ class ProjectView(ft.Container):
             ),
         )
 
-    def _upload_files(self, e):
-        file_picker = ft.FilePicker(on_result=self._on_file_pick)
-        self.page.overlay.append(file_picker)
-        self.page.update()
-        file_picker.pick_files(allow_multiple=True, allowed_extensions=["pdf", "docx", "txt", "md", "html", "csv", "json"])
+    async def _upload_files(self, e):
+        files = await ft.FilePicker().pick_files(
+            allow_multiple=True,
+            allowed_extensions=["pdf", "docx", "txt", "md", "html", "csv", "json"],
+        )
+        self._on_file_pick(files)
 
-    def _upload_folder(self, e):
+    async def _upload_folder(self, e):
         """Open a folder picker and upload all valid documents inside."""
-        folder_picker = ft.FilePicker(on_result=self._on_folder_pick)
-        self.page.overlay.append(folder_picker)
-        self.page.update()
-        folder_picker.get_directory_path()
+        path = await ft.FilePicker().get_directory_path()
+        self._on_folder_pick(path)
 
-    def _on_folder_pick(self, e):
-        if not e.path:
+    def _on_folder_pick(self, folder_path):
+        if not folder_path:
             return
         import os
         allowed_exts = {".pdf", ".docx", ".txt", ".md", ".html", ".csv", ".json"}
-        folder_path = e.path
         files_found = []
         for root, dirs, files in os.walk(folder_path):
             for f in files:
@@ -463,16 +461,16 @@ class ProjectView(ft.Container):
         self.update()
         self._load_project()
 
-    def _on_file_pick(self, e):
-        if not e.files:
+    def _on_file_pick(self, picked):
+        if not picked:
             return
-        total = len(e.files)
+        total = len(picked)
         self.status_text.value = f"Uploading {total} file{'s' if total > 1 else ''}..."
         self.status_text.color = WARNING
         self.update()
         success = 0
         failed = 0
-        for f in e.files:
+        for f in picked:
             try:
                 self._upload_single(f)
                 success += 1

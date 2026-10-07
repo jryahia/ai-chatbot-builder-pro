@@ -336,7 +336,7 @@ def dropdown(
         label=label_text,
         value=value,
         options=[ft.dropdown.Option(key=k, text=v) for k, v in options],
-        on_change=on_change,
+        on_select=on_change,
         width=width,
         label_style=ft.TextStyle(color=TEXT3, size=11),
         text_style=ft.TextStyle(color=TEXT, size=14),

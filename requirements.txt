@@ -1,5 +1,5 @@
 # Core desktop UI
-flet>=0.25.0
+flet>=0.84,<0.85
 
 # Web framework
 fastapi==0.115.5

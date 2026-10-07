@@ -439,11 +439,11 @@ class SettingsView(ft.Column):
             self._page.snack_bar.open = True
             self.update()
 
-    def _import_projects(self, e: ft.ControlEvent | None = None) -> None:
-        def on_file_result(result: ft.FilePickerResultEvent | None) -> None:
-            if result and result.files:
+    async def _import_projects(self, e: ft.ControlEvent | None = None) -> None:
+        def on_file_result(picked: list[ft.FilePickerFile]) -> None:
+            if picked:
                 try:
-                    path = result.files[0].path
+                    path = picked[0].path
                     from src.export import import_projects
                     count = import_projects(path)
                     self._page.snack_bar = toast(f"Imported {count} projects!")
@@ -455,10 +455,12 @@ class SettingsView(ft.Column):
                     self._page.snack_bar.open = True
                     self.update()
 
-        file_picker = ft.FilePicker(on_result=on_file_result)
-        self._page.overlay.append(file_picker)
-        self._page.update()
-        file_picker.pick_files(allow_multiple=False, file_type=ft.FilePickerFileType.CUSTOM, allowed_extensions=["json"])
+        picked = await ft.FilePicker().pick_files(
+            allow_multiple=False,
+            file_type=ft.FilePickerFileType.CUSTOM,
+            allowed_extensions=["json"],
+        )
+        on_file_result(picked)
 
     def _confirm_clear_data(self, e: ft.ControlEvent | None = None) -> None:
         def on_confirm(e: ft.ControlEvent | None = None) -> None:
